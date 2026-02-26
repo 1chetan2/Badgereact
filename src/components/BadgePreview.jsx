@@ -21,7 +21,7 @@ export default function BadgePreview({ badgeData }) {
       )}
 
       <h2>{badgeData.title}</h2>
-      <p>{badgeData.subtitle}</p>
+      <p>{badgeData.subtitle}</p>                                    
     </div>
   );
 }

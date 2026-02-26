@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import BadgeTemplates from "./pages/BadgeTemplates";
 import BadgeEditor from "./pages/BadgeEditor";
-import CsvUpload from "./pages/CsvUpload";
+import CsvUploadPage from "./pages/CsvUploadPage";
 import './App.css'
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/badges" element={<BadgeTemplates />} />
         <Route path="/badge-editor/:orgId" element={<BadgeEditor />} />
-        <Route path="/csv-upload" element={<CsvUpload />} />
+        <Route path="/csv-upload" element={<CsvUploadPage />} />
         <Route
           path="/dashboard"
           element={

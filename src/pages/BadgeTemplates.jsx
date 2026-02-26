@@ -111,7 +111,7 @@ export default function BadgeTemplates() {
             marginBottom: "20px",
             display: "flex",
             gap: "15px",
-            flexWrap: "wrap",
+            flexWrap: "wrap", 
             boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
           }}
         >
@@ -122,9 +122,9 @@ export default function BadgeTemplates() {
             style={{ padding: "10px", flex: "1 1 200px" }}
           />
 
-          <input
-            placeholder="Image URL"
-            value={imageUrl}
+          <input                                    
+            placeholder="Image URL"                       
+            value={imageUrl}                      
             onChange={(e) => setImageUrl(e.target.value)}
             style={{ padding: "10px", flex: "1 1 250px" }}
           />

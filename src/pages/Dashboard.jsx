@@ -136,7 +136,12 @@ export default function Dashboard() {
         <p style={{ cursor: "pointer" }} onClick={() => navigate("/badges")}>
           Badge Templates
         </p>
-       
+       <p
+  style={{ cursor: "pointer" }}
+  onClick={() => navigate("/csv-upload")}
+>
+  CSV Upload
+</p>
 
         <p>Settings</p>
         <button
@@ -145,7 +150,7 @@ export default function Dashboard() {
             marginTop: "20px",
             background: "#dc2626",
             color: "white",
-            border: "none",
+            border: "none",                                                                                       
             padding: "8px 15px",
             borderRadius: "6px",
             cursor: "pointer",
