@@ -19,14 +19,11 @@ const Sidebar = ({ collapsed }) => {
 
     const { token } = theme.useToken();
 
-    // In a real multi-tenant app, you might have specific role naming
-    // e.g. "OrganizationAdmin", "Admin", "User", "OrganizationUser"
-    // I am using "Admin" checking strictly what was requested
-    // Adjust 'Admin' to your actual claim if it differs
+  
     const isAdmin = hasRole('Admin') || hasRole('OrganizationAdmin') || hasRole('OrgAdmin');
 
     const getMenuItems = () => {
-        // Base items for all authenticated users
+       
         const items = [
             {
                 key: '/dashboard',
@@ -35,7 +32,6 @@ const Sidebar = ({ collapsed }) => {
             },
         ];
 
-        // Admin-only template management
         if (isAdmin) {
             items.push({
                 key: '/templates',
@@ -44,7 +40,6 @@ const Sidebar = ({ collapsed }) => {
             });
         }
 
-        // Generate and Jobs for everyone
         items.push({
             key: '/generate',
             icon: <AppstoreAddOutlined />,
@@ -56,7 +51,6 @@ const Sidebar = ({ collapsed }) => {
             label: 'Jobs',
         });
 
-        // Admin-only user management
         if (isAdmin) {
             items.push({
                 key: '/users',
@@ -79,7 +73,7 @@ const Sidebar = ({ collapsed }) => {
                 height: '100vh',
                 position: 'fixed',
                 left: 0,
-                top: 0,
+                top: 0,         
                 bottom: 0,
                 borderRight: `1px solid ${token.colorBorderSecondary}`,
                 boxShadow: '2px 0 8px 0 rgba(29,35,41,.05)'

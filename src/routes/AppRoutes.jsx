@@ -62,7 +62,7 @@ const AppRoutes = () => {
                 </Route>
             </Route>
 
-            {/* 404 Fallback */}
+        
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
     );

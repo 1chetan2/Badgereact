@@ -10,23 +10,20 @@ const { Title, Text } = Typography;
 
 const FieldToolbox = ({ onAddField }) => {
 
-    // When a button is clicked, we call the parent onAddField
-    // with reasonable defaults so it instantly appears centered
-    // or placed neatly in the Canvas
+   
     const handleAddField = (type) => {
         const newField = {
-            // Usually we'd use a UUID library here, but a quick Date-based
-            // ID works perfectly fine for the React key mappings
+            
             id: `field_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-            type: type, // 'TEXT', 'IMAGE', or 'QR'
+            type: type, 
             name: `New ${type}`,
-            // Sensible starting coordinates on the canvas (percentages)
+           
             x: 10,
             y: 10,
             width: type === 'TEXT' ? 40 : 25,
             height: type === 'TEXT' ? 15 : 25,
 
-            // Text-specific defaults
+            
             fontFamily: 'Arial, sans-serif',
             fontSize: 14,
             fontColor: '#000000',
@@ -34,9 +31,6 @@ const FieldToolbox = ({ onAddField }) => {
             isBold: false,
             isItalic: false,
             sampleText: type === 'TEXT' ? 'Sample Text' : '',
-
-            // Image/QR specific placeholder notes (often handled by the Properties panel later)
-            // e.g. mapping to "avatar" or "qrcode_value" 
             columnMapping: ''
         };
 

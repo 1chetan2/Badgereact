@@ -83,6 +83,7 @@ const JobsPage = () => {
             key: 'createdAt',
             render: (date) => date ? new Date(date).toLocaleString() : 'N/A',
             sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+            
         },
         {
             title: 'Action',

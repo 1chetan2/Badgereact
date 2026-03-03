@@ -100,7 +100,7 @@ const LoginPage = () => {
                             type="primary"
                             htmlType="submit"
                             block
-                            loading={loading}
+                            // loading={loading}
                             style={{
                                 height: '48px',
                                 fontSize: '16px',

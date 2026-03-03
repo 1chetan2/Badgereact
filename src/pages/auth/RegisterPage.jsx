@@ -58,7 +58,7 @@ const RegisterPage = () => {
                         name="name"
                         rules={[{ required: true, message: 'Please input your name!' }]}
                     >
-                        <Input prefix={<UserOutlined style={{ color: '#94a3b8' }} />} placeholder="John Doe" style={{ borderRadius: '8px' }} disabled={loading} />
+                        <Input prefix={<UserOutlined style={{ color: '#94a3b8' }} />} placeholder="Enter Your Name" style={{ borderRadius: '8px' }} disabled={loading} />
                     </Form.Item>
 
                     <Form.Item
@@ -66,7 +66,7 @@ const RegisterPage = () => {
                         name="organizationName"
                         rules={[{ required: true, message: 'Please input your organization!' }]}
                     >
-                        <Input prefix={<BankOutlined style={{ color: '#94a3b8' }} />} placeholder="Acme Corp" style={{ borderRadius: '8px' }} disabled={loading} />
+                        <Input prefix={<BankOutlined style={{ color: '#94a3b8' }} />} placeholder="xyz Corp" style={{ borderRadius: '8px' }} disabled={loading} />
                     </Form.Item>
 
                     <Form.Item
@@ -96,7 +96,7 @@ const RegisterPage = () => {
                             type="primary"
                             htmlType="submit"
                             block
-                            loading={loading}
+                            // loading={loading}
                             style={{
                                 height: '48px',
                                 fontSize: '16px',

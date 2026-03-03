@@ -7,6 +7,7 @@ import {
     CloseCircleOutlined,
     UserOutlined
 } from '@ant-design/icons';
+
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -21,6 +22,7 @@ const DashboardPage = () => {
         totalUsers: 0
     });
     const [loading, setLoading] = useState(true);
+    
     const { hasRole } = useAuth();
     
     const isAdmin = hasRole('Admin') || hasRole('OrganizationAdmin') || hasRole('OrgAdmin');

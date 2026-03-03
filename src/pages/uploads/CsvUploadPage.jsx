@@ -54,7 +54,7 @@ const CsvUploadPage = () => {
                 return Upload.LIST_IGNORE;
             }
 
-            // Validate size < 5MB
+            // Validate size 
             const isLt5M = file.size / 1024 / 1024 < 5;
             if (!isLt5M) {
                 message.error('CSV must smaller than 5MB!');
@@ -94,14 +94,14 @@ const CsvUploadPage = () => {
             const newJobId = uploadResponse.data.jobId || uploadResponse.data.id;
             setJobId(newJobId);
 
-            // Immediately fetch the preview for mapping
+  
             fetchPreview(newJobId);
 
         } catch (error) {
             console.error('CSV upload error:', error);
             const errorMsg = error.response?.data?.message || 'Failed to upload CSV file.';
             message.error(errorMsg);
-            setUploading(false); // Only set false on error to prevent re-clicks during preview load
+            setUploading(false);
         }
     };
 
@@ -109,8 +109,7 @@ const CsvUploadPage = () => {
         try {
             const previewResponse = await api.get(`/Csv/${id}/preview`);
 
-            // Backend returns List<Dictionary<string, string>>
-            // previewResponse.data = [{"Column1": "Val1", "Column2": "Val2"}, ...]
+            
 
             if (previewResponse.data && previewResponse.data.length > 0) {
                 const firstRow = previewResponse.data[0];

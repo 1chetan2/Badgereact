@@ -28,10 +28,10 @@ const PropertiesPanel = ({ selectedField, onUpdateField }) => {
         }
     }, [selectedField, form]);
 
-    // This gets called continuously as the user types/changes properties
+
     const handleValuesChange = (changedValues) => {
         if (selectedField) {
-            // Because values might be undefined if relying solely on changedValues, we merge
+            
             onUpdateField(selectedField.id, changedValues);
         }
     };
@@ -66,7 +66,7 @@ const PropertiesPanel = ({ selectedField, onUpdateField }) => {
                 onValuesChange={handleValuesChange}
                 size="middle"
             >
-                {/* GEOMETRY SECTION */}
+              
                 <Divider orientation="left" style={{ marginTop: 0 }}>Dimensions (%)</Divider>
                 <Row gutter={12}>
                     <Col span={12}>
@@ -93,7 +93,7 @@ const PropertiesPanel = ({ selectedField, onUpdateField }) => {
                     </Col>
                 </Row>
 
-                {/* TEXT SETTINGS SECTION (Conditionally rendered) */}
+               
                 {selectedField.type === 'TEXT' && (
                     <>
                         <Divider orientation="left">Text Formatting</Divider>
