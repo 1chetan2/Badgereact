@@ -1,36 +1,29 @@
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import AppRoutes from './routes/AppRoutes';
+import './index.css';
 
-
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./ProtectedRoute";
-import BadgeTemplates from "./pages/BadgeTemplates";
-import BadgeEditor from "./pages/BadgeEditor";
-import CsvUploadPage from "./pages/CsvUploadPage";
-import './App.css'
+import { ConfigProvider } from 'antd';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/badges" element={<BadgeTemplates />} />
-        <Route path="/badge-editor/:orgId" element={<BadgeEditor />} />
-        <Route path="/csv-upload" element={<CsvUploadPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <AuthProvider>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#4f46e5',
+              borderRadius: 8,
+              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            },
+          }}
+        >
+          <AppRoutes />
+        </ConfigProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
 
 export default App;
- 

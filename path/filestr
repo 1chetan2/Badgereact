@@ -1,0 +1,58 @@
+src/
+ ├── pages/
+ │    auth/
+ │       LoginPage.jsx
+ │       RegisterPage.jsx
+ │
+ │    dashboard/
+ │       DashboardPage.jsx
+ │
+ │    users/
+ │       UsersListPage.jsx
+ │       CreateUserPage.jsx
+ │       EditUserPage.jsx
+ │
+ │    templates/
+ │       TemplateListPage.jsx
+ │       TemplateEditorPage.jsx
+ │
+ │    uploads/
+ │       CsvUploadPage.jsx
+ │       FieldMappingPage.jsx
+ │
+ │    jobs/
+ │       GenerationPage.jsx
+ │       JobsPage.jsx
+ │
+ ├── components/
+ │    layout/
+ │       Navbar.jsx
+ │       Sidebar.jsx
+ │       ProtectedRoute.jsx
+ │
+ │    designer/
+ │       BadgeCanvas.jsx
+ │       FieldToolbox.jsx
+ │       PropertiesPanel.jsx
+ │
+ │    common/
+ │       JobStatusBadge.jsx
+ │       CsvPreviewTable.jsx
+ │       Loader.jsx
+ │
+ ├── services/
+ │    api.js
+ │    authService.js
+ │    userService.js
+ │    templateService.js
+ │    uploadService.js
+ │    jobService.js
+ │
+ ├── routes/
+ │    AppRoutes.jsx
+ │
+ ├── context/
+ │    AuthContext.jsx
+ │
+ ├── App.jsx
+ ├── main.jsx
