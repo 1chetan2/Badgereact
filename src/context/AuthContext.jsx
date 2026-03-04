@@ -13,13 +13,18 @@ export const AuthProvider = ({ children }) => {
             try {
                 const decodedUser = jwtDecode(token);
 
-                // Extract role properly depending on how the given backend formats claims
-                const roleClaimUrl = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
-                const role = decodedUser.role || decodedUser[roleClaimUrl] || null;
+                // Mapping standard .NET claims for identity
+                const roleClaim = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+                const emailClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
+                const nameClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name";
+                const idClaim = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 
                 setUser({
                     ...decodedUser,
-                    role: role,
+                    id: decodedUser.sub || decodedUser.id || decodedUser[idClaim],
+                    email: decodedUser.email || decodedUser[emailClaim],
+                    name: decodedUser.unique_name || decodedUser[nameClaim],
+                    role: decodedUser.role || decodedUser[roleClaim] || null,
                 });
             } catch (error) {
                 console.error("Invalid token:", error);

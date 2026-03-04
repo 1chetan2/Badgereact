@@ -177,7 +177,7 @@ const GenerationPage = () => {
                 <Result
                     status="error"
                     title="Generation Failed"
-                    subTitle={errorMsg || "We encountered an unexpected error while building your files."}
+                    subTitle={errorMsg || "We encountered+ an unexpected error while building your files."}
                     extra={[
                         <Button
                             type="primary"
@@ -228,7 +228,7 @@ const GenerationPage = () => {
                         }}>
                             {/* IFRAME Rendering the PDF Blob / URL */}
                             <iframe
-                                src={pdfUrl ? `${api.defaults.baseURL.replace('/api', '')}${pdfUrl}` : ''}
+                                src={pdfUrl ? `${api.defaults.baseURL.replace('/api', '')}${pdfUrl}${pdfUrl.includes('?') ? '&' : '?'}inline=true` : ''}
                                 width="100%"
                                 height="100%"
                                 title="PDF Preview"

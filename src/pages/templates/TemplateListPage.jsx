@@ -90,7 +90,6 @@ const TemplateListPage = () => {
             dataIndex: 'createdAt',
             key: 'createdAt',
             render: (date) => date ? new Date(date).toLocaleDateString() : 'N/A',
-            sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
         },
         {
             title: 'Actions',

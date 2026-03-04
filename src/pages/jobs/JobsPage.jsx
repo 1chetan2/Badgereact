@@ -46,6 +46,8 @@ const JobsPage = () => {
             dataIndex: 'id',
             key: 'id',
             render: (text, record) => <Text strong>{record.id || record._id}</Text>,
+            sorter: (a, b) => (a.id || a._id) - (b.id || b._id),
+            defaultSortOrder: 'descend',
         },
         {
             title: 'Template Name',
@@ -74,6 +76,8 @@ const JobsPage = () => {
                 { text: 'PdfGenerated', value: 'PdfGenerated' },
                 { text: 'Processing', value: 'Processing' },
                 { text: 'Failed', value: 'Failed' },
+                { text: 'Uploaded', value: 'Uploaded' },
+                { text: 'Mapped', value: 'Mapped' },
             ],
             onFilter: (value, record) => record.status === value,
         },
@@ -82,8 +86,6 @@ const JobsPage = () => {
             dataIndex: 'createdAt',
             key: 'createdAt',
             render: (date) => date ? new Date(date).toLocaleString() : 'N/A',
-            sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
-            
         },
         {
             title: 'Action',
@@ -113,7 +115,7 @@ const JobsPage = () => {
                     columns={columns}
                     dataSource={jobs}
                     loading={loading}
-                    pagination={{ pageSize: 10 }}
+                    pagination={{ pageSize: 6 }}
                     scroll={{ x: true }}
                 />
             </Card>

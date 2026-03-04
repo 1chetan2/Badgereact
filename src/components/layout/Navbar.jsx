@@ -24,19 +24,6 @@ const Navbar = ({ collapsed, setCollapsed }) => {
 
     const userMenuItems = [
         {
-            key: 'profile',
-            icon: <UserOutlined />,
-            label: 'My Profile',
-        },
-        {
-            key: 'settings',
-            icon: <SettingOutlined />,
-            label: 'Settings',
-        },
-        {
-            type: 'divider',
-        },
-        {
             key: 'logout',
             icon: <LogoutOutlined style={{ color: '#ff4d4f' }} />,
             label: <span style={{ color: '#ff4d4f' }}>Logout</span>,
@@ -87,7 +74,7 @@ const Navbar = ({ collapsed, setCollapsed }) => {
                             icon={<UserOutlined />}
                         />
                         <Space style={{ marginLeft: 8 }} className="user-name-text">
-                            <Text strong>{user?.name || user?.email || 'User'}</Text>
+                            <Text strong>{user?.name || user?.email?.split('@')[0] || 'User'}</Text>
                         </Space>
                     </div>
                 </Dropdown>
