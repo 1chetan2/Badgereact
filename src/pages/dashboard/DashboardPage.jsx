@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Statistic, Typography, Spin, message } from 'antd';
-import {
-    FileImageOutlined,
-    AppstoreOutlined,
-    CheckCircleOutlined,
-    CloseCircleOutlined,
-    UserOutlined
-} from '@ant-design/icons';
-
+import { Row, Col, Card, Spinner } from 'react-bootstrap';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-
-const { Title, Text } = Typography;
 
 const DashboardPage = () => {
     const [stats, setStats] = useState({
@@ -22,9 +12,8 @@ const DashboardPage = () => {
         totalUsers: 0
     });
     const [loading, setLoading] = useState(true);
-    
+
     const { hasRole } = useAuth();
-    
     const isAdmin = hasRole('Admin') || hasRole('OrganizationAdmin') || hasRole('OrgAdmin');
 
     useEffect(() => {
@@ -40,7 +29,6 @@ const DashboardPage = () => {
                 });
             } catch (error) {
                 console.error("Failed to fetch dashboard stats", error);
-                message.error("Could not load dashboard statistics.");
             } finally {
                 setLoading(false);
             }
@@ -49,90 +37,82 @@ const DashboardPage = () => {
         fetchStats();
     }, []);
 
-    const activeCardStyle = {
-        borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-        border: 'none',
-        height: '100%',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-    };
+    const StatCard = ({ title, value, icon, color, textColor = 'text-dark' }) => (
+        <Card className="shadow-sm border-0 h-100 rounded-3">
+            <Card.Body className="d-flex align-items-center p-4">
+                <div
+                    className={`rounded-3 d-flex align-items-center justify-content-center me-4 bg-light`}
+                    style={{ width: '60px', height: '60px', color: color }}
+                >
+                    <i className={`bi ${icon} fs-2`}></i>
+                </div>
+                <div>
+                    <h6 className="text-secondary fw-semibold mb-1">{title}</h6>
+                    <h2 className={`fw-bold mb-0 ${textColor}`}>{value}</h2>
+                </div>
+            </Card.Body>
+        </Card>
+    );
 
     return (
-        <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100%' }}>
-            <div style={{ marginBottom: 32 }}>
-                <Title level={2} style={{ margin: 0, color: '#1f2937' }}>Dashboard</Title>
-                <Text type="secondary">Overview of your BadgeCraft jobs and templates.</Text>
+        <div>
+            <div className="mb-4">
+                <h2 className="fw-bold text-dark">Dashboard</h2>
+                <p className="text-secondary">Overview of your BadgeCraft jobs and templates.</p>
             </div>
 
             {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-                    <Spin size="large" />
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
+                    <Spinner animation="border" variant="primary" />
                 </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    {/* Top Row: Jobs Statistics */}
-                    <Row gutter={[24, 24]}>
-                        <Col xs={24} md={8}>
-                            <Card style={activeCardStyle} hoverable bodyStyle={{ padding: '24px' }}>
-                                <Statistic
-                                    title={<Text strong style={{ color: '#6b7280', fontSize: '14px' }}>Total Jobs</Text>}
-                                    value={stats.totalJobs}
-                                    prefix={<AppstoreOutlined style={{ color: '#722ed1', marginRight: '8px' }} />}
-                                    valueStyle={{ color: '#111827', fontWeight: 600, fontSize: '28px', marginTop: '12px' }}
-                                />
-                            </Card>
+                <div className="g-4 flex-column">
+                    <Row className="g-4 mb-4">
+                        <Col xs={12} md={4}>
+                            <StatCard
+                                title="Total Jobs"
+                                value={stats.totalJobs}
+                                icon="bi-stack"
+                                color="#6f42c1"
+                            />
                         </Col>
-
-                        <Col xs={24} md={8}>
-                            <Card style={activeCardStyle} hoverable bodyStyle={{ padding: '24px' }}>
-                                <Statistic
-                                    title={<Text strong style={{ color: '#6b7280', fontSize: '14px' }}>Completed Jobs</Text>}
-                                    value={stats.completedJobs}
-                                    prefix={<CheckCircleOutlined style={{ color: '#52c41a', marginRight: '8px' }} />}
-                                    valueStyle={{ color: '#52c41a', fontWeight: 600, fontSize: '28px', marginTop: '12px' }}
-                                />
-                            </Card>
+                        <Col xs={12} md={4}>
+                            <StatCard
+                                title="Completed Jobs"
+                                value={stats.completedJobs}
+                                icon="bi-check-circle"
+                                color="#198754"
+                                textColor="text-success"
+                            />
                         </Col>
-
-                        <Col xs={24} md={8}>
-                            <Card style={activeCardStyle} hoverable bodyStyle={{ padding: '24px' }}>
-                                <Statistic
-                                    title={<Text strong style={{ color: '#6b7280', fontSize: '14px' }}>Failed Jobs</Text>}
-                                    value={stats.failedJobs}
-                                    prefix={<CloseCircleOutlined style={{ color: '#ff4d4f', marginRight: '8px' }} />}
-                                    valueStyle={{ color: '#ff4d4f', fontWeight: 600, fontSize: '28px', marginTop: '12px' }}
-                                />
-                            </Card>
+                        <Col xs={12} md={4}>
+                            <StatCard
+                                title="Failed Jobs"
+                                value={stats.failedJobs}
+                                icon="bi-x-circle"
+                                color="#dc3545"
+                                textColor="text-danger"
+                            />
                         </Col>
                     </Row>
 
-                    {/* Bottom Row: Templates and Users */}
-                    <Row gutter={[24, 24]}>
-                        <Col xs={24} md={12}>
-                            <Card
-                                style={activeCardStyle}
-                                hoverable
-                                bodyStyle={{ padding: '24px' }}
-                            >
-                                <Statistic
-                                    title={<Text strong style={{ color: '#6b7280', fontSize: '14px' }}>Total Templates</Text>}
-                                    value={stats.totalTemplates}
-                                    prefix={<FileImageOutlined style={{ color: '#1890ff', marginRight: '8px' }} />}
-                                    valueStyle={{ color: '#111827', fontWeight: 600, fontSize: '28px', marginTop: '12px' }}
-                                />
-                            </Card>
+                    <Row className="g-4">
+                        <Col xs={12} md={isAdmin ? 6 : 12}>
+                            <StatCard
+                                title="Total Templates"
+                                value={stats.totalTemplates}
+                                icon="bi-file-earmark-image"
+                                color="#0d6efd"
+                            />
                         </Col>
-
                         {isAdmin && (
-                            <Col xs={24} md={12}>
-                                <Card style={activeCardStyle} hoverable bodyStyle={{ padding: '24px' }}>
-                                    <Statistic
-                                        title={<Text strong style={{ color: '#6b7280', fontSize: '14px' }}>Total Users</Text>}
-                                        value={stats.totalUsers}
-                                        prefix={<UserOutlined style={{ color: '#fa8c16', marginRight: '8px' }} />}
-                                        valueStyle={{ color: '#111827', fontWeight: 600, fontSize: '28px', marginTop: '12px' }}
-                                    />
-                                </Card>
+                            <Col xs={12} md={6}>
+                                <StatCard
+                                    title="Total Users"
+                                    value={stats.totalUsers}
+                                    icon="bi-people"
+                                    color="#fd7e14"
+                                />
                             </Col>
                         )}
                     </Row>

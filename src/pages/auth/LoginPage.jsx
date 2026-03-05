@@ -1,129 +1,124 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Typography, message } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Card, Form, Button, Container, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
-const { Title, Text } = Typography;
-
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
     const { user, login } = useAuth();
     const navigate = useNavigate();
 
-    // Redirect to dashboard if already logged in
     useEffect(() => {
         if (user) {
             navigate('/dashboard', { replace: true });
         }
     }, [user, navigate]);
 
-    const onFinish = async (values) => {
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setError('');
         setLoading(true);
-        try {
-            const response = await api.post('/auth/login', {
-                email: values.email,
-                password: values.password,
-            });
 
+        try {
+            const response = await api.post('/auth/login', { email, password });
             const token = response.data?.token || response.data?.accessToken || (typeof response.data === 'string' ? response.data : null);
 
             if (token) {
                 login(token);
-                message.success('Login successful!');
                 navigate('/dashboard');
             } else {
-                message.error('Token not found in response.');
+                setError('Authentication failed: Token not provided');
             }
         } catch (error) {
             console.error('Login error:', error);
-            const errorMsg = error.response?.data?.message ||
-                (typeof error.response?.data === 'string' ? error.response.data : undefined) ||
-                'Login failed. Please check your credentials and try again.';
-
-            message.error(errorMsg);
+            setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="auth-page-wrapper">
-            <Card
-                className="auth-card"
-                style={{ width: '100%', maxWidth: 420, borderRadius: '16px' }}
-                bodyStyle={{ padding: '40px 32px' }}
-            >
-                <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                    <Title level={2} style={{ color: '#4f46e5', margin: 0, fontWeight: 800 }}>BadgeCraft</Title>
-                    <Text type="secondary" style={{ fontSize: '16px' }}>Sign in to your account</Text>
-                </div>
+        <div className="bg-light min-vh-100 d-flex align-items-center">
+            <Container>
+                <Row className="justify-content-center">
+                    <Col xs={12} sm={10} md={8} lg={5} xl={4}>
+                        <div className="text-center mb-4">
+                            <h1 className="fw-bold text-primary display-5 mb-1">BadgeCraft</h1>
+                            <p className="text-secondary">Sign in to your account</p>
+                        </div>
 
-                <Form
-                    name="login_form"
-                    layout="vertical"
-                    onFinish={onFinish}
-                    autoComplete="off"
-                    size="large"
-                >
-                    <Form.Item
-                        label="Email Address"
-                        name="email"
-                        rules={[
-                            { required: true, message: 'Please input your email!' },
-                            { type: 'email', message: 'Please enter a valid email!' }
-                        ]}
-                    >
-                        <Input
-                            prefix={<UserOutlined style={{ color: '#94a3b8' }} />}
-                            placeholder="name@company.com"
-                            style={{ borderRadius: '8px' }}
-                        />
-                    </Form.Item>
+                        <Card className="shadow border-0 rounded-4 overflow-hidden">
+                            <Card.Body className="p-4 p-md-5">
+                                {error && <Alert variant="danger" className="py-2 small">{error}</Alert>}
 
-                    <Form.Item
-                        label="Password"
-                        name="password"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
-                        style={{ marginBottom: 8 }}
-                    >
-                        <Input.Password
-                            prefix={<LockOutlined style={{ color: '#94a3b8' }} />}
-                            placeholder="••••••••"
-                            style={{ borderRadius: '8px' }}
-                        />
-                    </Form.Item>
+                                <Form onSubmit={handleLogin}>
+                                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                                        <Form.Label className="small fw-semibold text-secondary">Email Address</Form.Label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <i className="bi bi-envelope text-muted"></i>
+                                            </span>
+                                            <Form.Control
+                                                type="email"
+                                                placeholder="name@company.com"
+                                                className="bg-light border-start-0 ps-0"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </Form.Group>
 
-                    <Form.Item>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            block
-                            // loading={loading}
-                            style={{
-                                height: '48px',
-                                fontSize: '16px',
-                                fontWeight: 600,
-                                borderRadius: '8px',
-                                background: '#4f46e5',
-                                border: 'none',
-                                boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.4)',
-                                marginTop: '24px'
-                            }}
-                        >
-                            Sign In
-                        </Button>
-                    </Form.Item>
+                                    <Form.Group className="mb-4" controlId="formBasicPassword">
+                                        <Form.Label className="small fw-semibold text-secondary">Password</Form.Label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <i className="bi bi-lock text-muted"></i>
+                                            </span>
+                                            <Form.Control
+                                                type="password"
+                                                placeholder="••••••••"
+                                                className="bg-light border-start-0 ps-0"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </Form.Group>
 
-                    <div style={{ textAlign: 'center', marginTop: 16 }}>
-                        <Text type="secondary">Don't have an account? </Text>
-                        <Button type="link" onClick={() => navigate('/register')} style={{ padding: 0 }}>
-                            Create account
-                        </Button>
-                    </div>
-                </Form>
-            </Card>
+                                    <Button
+                                        variant="primary"
+                                        type="submit"
+                                        className="w-100 py-2 fw-bold shadow-sm rounded-3 mb-3 d-flex align-items-center justify-content-center"
+                                        disabled={loading}
+                                    >
+                                        {loading ? <Spinner animation="border" size="sm" className="me-2" /> : 'Sign In'}
+                                    </Button>
+
+                                    <div className="text-center">
+                                        <span className="text-secondary small">Don't have an account? </span>
+                                        <Button
+                                            variant="link"
+                                            className="p-0 small fw-semibold text-decoration-none"
+                                            onClick={() => navigate('/register')}
+                                        >
+                                            Create account
+                                        </Button>
+                                    </div>
+                                </Form>
+                            </Card.Body>
+                        </Card>
+                        <p className="text-center text-muted mt-4 small">
+                            &copy; {new Date().getFullYear()} BadgeCraft. All rights reserved.
+                        </p>
+                    </Col>
+                </Row>
+            </Container>
         </div>
     );
 };

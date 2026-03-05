@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Button, Input, Space, Typography, message, Spin, Row, Col, Card } from 'antd';
-import { SaveOutlined, ArrowLeftOutlined, CloudUploadOutlined } from '@ant-design/icons';
+import { Button, Form, Spinner, Row, Col, Card, Container, Navbar, Nav } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import BadgeCanvas from '../../components/designer/BadgeCanvas';
 import FieldToolbox from '../../components/designer/FieldToolbox';
 import PropertiesPanel from '../../components/designer/PropertiesPanel';
 import api from '../../services/api';
-
-const { Header, Content, Sider } = Layout;
-const { Title, Text } = Typography;
 
 const TemplateEditorPage = () => {
     const { id } = useParams();
@@ -54,7 +50,7 @@ const TemplateEditorPage = () => {
         return {
             name: templateName,
             status: 'Published',
-            pageSize: 'A4', // Defaults
+            pageSize: 'A4',
             badgesPerPage: 1,
             badgeWidth: 86,
             badgeHeight: 54,
@@ -89,7 +85,6 @@ const TemplateEditorPage = () => {
                     mapBackendToFrontend(response.data);
                 } catch (error) {
                     console.error('Failed to fetch template:', error);
-                    message.error('Could not load template data.');
                 } finally {
                     setLoading(false);
                 }
@@ -113,24 +108,21 @@ const TemplateEditorPage = () => {
 
     const handleSave = async () => {
         if (!templateName.trim()) {
-            return message.warning('Please provide a name for your template.');
+            return alert('Please provide a name for your template.');
         }
 
         setSaving(true);
         try {
             const payload = mapFrontendToBackend();
-
             if (isEditMode) {
                 await api.put(`/BadgeTemplates/${id}`, payload);
-                message.success('Template updated successfully!');
             } else {
                 await api.post('/BadgeTemplates', payload);
-                message.success('Template created successfully!');
             }
             navigate('/templates');
         } catch (error) {
-            console.error('Save template error:', error);
-            message.error('Failed to save template. Check if your role is OrgAdmin.');
+            console.error('Save error:', error);
+            alert('Failed to save template. Check your permissions.');
         } finally {
             setSaving(false);
         }
@@ -140,74 +132,83 @@ const TemplateEditorPage = () => {
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Spin size="large" tip="Loading template designer..." />
+            <div className="vh-100 d-flex flex-column align-items-center justify-content-center bg-light">
+                <Spinner animation="border" variant="primary" className="mb-3" />
+                <h5 className="text-secondary fw-bold">Loading Designer...</h5>
             </div>
         );
     }
 
     return (
-        <Layout style={{ height: 'calc(100vh - 64px)', background: '#f0f2f5' }}>
-            <Header style={{
-                background: '#fff',
-                padding: '0 24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                borderBottom: '1px solid #e5e7eb',
-                height: '64px'
-            }}>
-                <Space size="large">
-                    <Button
-                        icon={<ArrowLeftOutlined />}
-                        onClick={() => navigate('/templates')}
-                        type="text"
-                    />
-                    <Input
-                        value={templateName}
-                        onChange={(e) => setTemplateName(e.target.value)}
-                        style={{ width: '300px', fontWeight: 600, fontSize: '16px' }}
-                        placeholder="Template Name"
-                    />
-                </Space>
+        <div className="d-flex flex-column" style={{ height: 'calc(100vh - 72px)', margin: '-24px -24px -24px -24px' }}>
+            {/* Editor Toolbar */}
+            <Navbar bg="white" className="border-bottom px-4 py-2 sticky-top shadow-sm">
                 <Button
-                    type="primary"
-                    icon={<SaveOutlined />}
-                    size="large"
-                    loading={saving}
-                    onClick={handleSave}
+                    variant="link"
+                    className="text-dark p-0 me-4"
+                    onClick={() => navigate('/templates')}
                 >
-                    Save Template
+                    <i className="bi bi-arrow-left fs-4"></i>
                 </Button>
-            </Header>
-            <Layout>
-                <Sider width={260} theme="light" style={{ borderRight: '1px solid #e5e7eb' }}>
+
+                <Form.Control
+                    type="text"
+                    className="border-0 fw-bold fs-5 p-0 bg-transparent flex-grow-1 mx-2"
+                    style={{ maxWidth: '400px', outline: 'none', boxShadow: 'none' }}
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="Enter template name..."
+                />
+
+                <Nav className="ms-auto d-flex gap-2">
+                    <Button
+                        variant="primary"
+                        className="rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center"
+                        onClick={handleSave}
+                        disabled={saving}
+                    >
+                        {saving ? <Spinner animation="border" size="sm" className="me-2" /> : <i className="bi bi-cloud-arrow-up me-2"></i>}
+                        Save Template
+                    </Button>
+                </Nav>
+            </Navbar>
+
+            {/* Main Designer Area */}
+            <div className="d-flex flex-grow-1 overflow-hidden h-100">
+                {/* Left Sidebar: Toolbox */}
+                <div className="border-end bg-white overflow-auto h-100" style={{ width: '280px', flexShrink: 0 }}>
                     <FieldToolbox onAddField={handleAddField} />
-                </Sider>
-                <Content style={{ padding: '24px', position: 'relative' }}>
-                    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <Card
-                            style={{ flex: 1, borderRadius: '12px', overflow: 'hidden' }}
-                            bodyStyle={{ height: '100%', padding: 0 }}
-                        >
-                            <BadgeCanvas
-                                fields={fields}
-                                onUpdateField={handleUpdateField}
-                                selectedFieldId={selectedFieldId}
-                                onSelectField={handleSelectField}
-                                backgroundImage={backgroundImage}
-                            />
+                </div>
+
+                {/* Center: Canvas Area */}
+                <div className="flex-grow-1 bg-light h-100 position-relative p-4 overflow-auto d-flex justify-content-center">
+                    <div style={{ width: 'fit-content' }}>
+                        <Card className="shadow-lg border-0 rounded-4 overflow-hidden mb-4">
+                            <Card.Body className="p-0 bg-secondary bg-opacity-10">
+                                <BadgeCanvas
+                                    fields={fields}
+                                    onUpdateField={handleUpdateField}
+                                    selectedFieldId={selectedFieldId}
+                                    onSelectField={handleSelectField}
+                                    backgroundImage={backgroundImage}
+                                />
+                            </Card.Body>
                         </Card>
+                        <div className="text-center text-muted small opacity-75">
+                            <i className="bi bi-info-circle me-1"></i> Drag and resize elements on the canvas
+                        </div>
                     </div>
-                </Content>
-                <Sider width={320} theme="light" style={{ borderLeft: '1px solid #e5e7eb' }}>
+                </div>
+
+                {/* Right Sidebar: Properties */}
+                <div className="border-start bg-white overflow-auto h-100" style={{ width: '320px', flexShrink: 0 }}>
                     <PropertiesPanel
                         selectedField={selectedField}
                         onUpdateField={handleUpdateField}
                     />
-                </Sider>
-            </Layout>
-        </Layout>
+                </div>
+            </div>
+        </div>
     );
 };
 

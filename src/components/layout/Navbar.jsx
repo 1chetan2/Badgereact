@@ -1,17 +1,7 @@
 import React from 'react';
-import { Layout, Dropdown, Menu, Avatar, Typography, Button, Space } from 'antd';
-import {
-    UserOutlined,
-    LogoutOutlined,
-    SettingOutlined,
-    MenuFoldOutlined,
-    MenuUnfoldOutlined
-} from '@ant-design/icons';
+import { Navbar as BootNavbar, Container, Dropdown, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
-const { Header } = Layout;
-const { Text } = Typography;
 
 const Navbar = ({ collapsed, setCollapsed }) => {
     const { user, logout } = useAuth();
@@ -22,64 +12,44 @@ const Navbar = ({ collapsed, setCollapsed }) => {
         navigate('/login');
     };
 
-    const userMenuItems = [
-        {
-            key: 'logout',
-            icon: <LogoutOutlined style={{ color: '#ff4d4f' }} />,
-            label: <span style={{ color: '#ff4d4f' }}>Logout</span>,
-            onClick: handleLogout,
-        },
-    ];
-
     return (
-        <Header
-            style={{
-                padding: '0 24px',
-                background: '#ffffff',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                boxShadow: '0 1px 4px rgba(0,21,41,.08)',
-                zIndex: 1
-            }}
-        >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+        <BootNavbar bg="white" className="border-bottom shadow-sm py-2 sticky-top" style={{ height: '64px' }}>
+            <Container fluid className="px-3">
                 <Button
-                    type="text"
-                    icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                    variant="link"
+                    className="text-dark p-0 me-3"
                     onClick={() => setCollapsed(!collapsed)}
-                    style={{
-                        fontSize: '16px',
-                        width: 64,
-                        height: 64,
-                        marginLeft: -24,
-                    }}
-                />
-            </div>
+                >
+                    <i className={`bi ${collapsed ? 'bi-text-indent-left' : 'bi-text-indent-right'} fs-4`}></i>
+                </Button>
 
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
-                    <div style={{
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '4px 12px',
-                        borderRadius: '6px',
-                        transition: 'background 0.3s'
-                    }}
-                        className="avatar-dropdown-trigger"
-                    >
-                        <Avatar
-                            style={{ backgroundColor: '#1890ff' }}
-                            icon={<UserOutlined />}
-                        />
-                        <Space style={{ marginLeft: 8 }} className="user-name-text">
-                            <Text strong>{user?.name || user?.email?.split('@')[0] || 'User'}</Text>
-                        </Space>
-                    </div>
-                </Dropdown>
-            </div>
-        </Header>
+                <div className="ms-auto d-flex align-items-center">
+                    <Dropdown align="end">
+                        <Dropdown.Toggle
+                            variant="link"
+                            id="dropdown-user"
+                            className="d-flex align-items-center text-decoration-none text-dark p-1 rounded hover-bg-light border-0 shadow-none"
+                        >
+                            <div
+                                className="bg-primary text-white d-flex align-items-center justify-content-center rounded-circle me-2"
+                                style={{ width: '32px', height: '32px', fontSize: '14px' }}
+                            >
+                                <i className="bi bi-person"></i>
+                            </div>
+                            <span className="fw-semibold d-none d-sm-inline">
+                                {user?.name || user?.email?.split('@')[0] || 'User'}
+                            </span>
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu className="shadow border-0 mt-2">
+                            <Dropdown.Item onClick={handleLogout} className="text-danger d-flex align-items-center py-2">
+                                <i className="bi bi-box-arrow-right me-2"></i> Logout
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+            </Container>
+        </BootNavbar>
     );
 };
 

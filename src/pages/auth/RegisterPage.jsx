@@ -1,125 +1,157 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message, Row, Col } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined, BankOutlined } from '@ant-design/icons';
+import { Card, Form, Button, Container, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
-const { Title, Text } = Typography;
-
 const RegisterPage = () => {
     const [loading, setLoading] = useState(false);
+    const [name, setName] = useState('');
+    const [organizationName, setOrganizationName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
     const navigate = useNavigate();
 
-    const onFinish = async (values) => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setError('');
         setLoading(true);
+
         try {
             await api.post('/auth/register', {
-                name: values.name,
-                email: values.email,
-                password: values.password,
-                organizationName: values.organizationName,
+                name,
+                email,
+                password,
+                organizationName,
             });
 
-            message.success('Registration successful! Please log in.');
             navigate('/login');
         } catch (error) {
             console.error('Registration error:', error);
-            const errorMsg = error.response?.data?.message ||
-                (typeof error.response?.data === 'string' ? error.response.data : undefined) ||
-                'Registration failed. Please check your details and try again.';
-
-            message.error(errorMsg);
+            setError(error.response?.data?.message || 'Registration failed. Please check your details.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="auth-page-wrapper">
-            <Card
-                className="auth-card"
-                style={{ width: '100%', maxWidth: 480, borderRadius: '16px' }}
-                bodyStyle={{ padding: '40px 32px' }}
-            >
-                <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                    <Title level={2} style={{ color: '#4f46e5', margin: 0, fontWeight: 800 }}>Join BadgeCraft</Title>
-                    <Text type="secondary" style={{ fontSize: '16px' }}>Create your account to start designing</Text>
-                </div>
+        <div className="bg-light min-vh-100 d-flex align-items-center py-5">
+            <Container>
+                <Row className="justify-content-center">
+                    <Col xs={12} sm={10} md={8} lg={6} xl={5}>
+                        <div className="text-center mb-4">
+                            <h1 className="fw-bold text-primary display-5 mb-1">BadgeCraft</h1>
+                           
+                        </div>
 
-                <Form
-                    name="register_form"
-                    layout="vertical"
-                    onFinish={onFinish}
-                    autoComplete="off"
-                    size="large"
-                >
-                    <Form.Item
-                        label="Full Name"
-                        name="name"
-                        rules={[{ required: true, message: 'Please input your name!' }]}
-                    >
-                        <Input prefix={<UserOutlined style={{ color: '#94a3b8' }} />} placeholder="Enter Your Name" style={{ borderRadius: '8px' }} disabled={loading} />
-                    </Form.Item>
+                        <Card className="shadow border-0 rounded-4 overflow-hidden">
+                            <Card.Body className="p-4 p-md-5">
+                                {error && <Alert variant="danger" className="py-2 small">{error}</Alert>}
 
-                    <Form.Item
-                        label="Organization Name"
-                        name="organizationName"
-                        rules={[{ required: true, message: 'Please input your organization!' }]}
-                    >
-                        <Input prefix={<BankOutlined style={{ color: '#94a3b8' }} />} placeholder="xyz Corp" style={{ borderRadius: '8px' }} disabled={loading} />
-                    </Form.Item>
+                                <Form onSubmit={handleRegister}>
+                                    <Row>
+                                        <Col md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label className="small fw-semibold text-secondary">Full Name</Form.Label>
+                                                <div className="input-group">
+                                                    <span className="input-group-text bg-light border-end-0">
+                                                        <i className="bi bi-person text-muted"></i>
+                                                    </span>
+                                                    <Form.Control
+                                                        type="text"
+                                                        
+                                                        className="bg-light border-start-0 ps-0"
+                                                        value={name}
+                                                        onChange={(e) => setName(e.target.value)}
+                                                        required
+                                                    />
+                                                </div>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col md={12}>
+                                            <Form.Group className="mb-3">
+                                                <Form.Label className="small fw-semibold text-secondary">Organization Name</Form.Label>
+                                                <div className="input-group">
+                                                    <span className="input-group-text bg-light border-end-0">
+                                                        <i className="bi bi-building text-muted"></i>
+                                                    </span>
+                                                    <Form.Control
+                                                        type="text"
+                                                      
+                                                        className="bg-light border-start-0 ps-0"
+                                                        value={organizationName}
+                                                        onChange={(e) => setOrganizationName(e.target.value)}
+                                                        required
+                                                    />
+                                                </div>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
 
-                    <Form.Item
-                        label="Email Address"
-                        name="email"
-                        rules={[
-                            { required: true, message: 'Please input your email!' },
-                            { type: 'email', message: 'Please enter a valid email!' }
-                        ]}
-                    >
-                        <Input prefix={<MailOutlined style={{ color: '#94a3b8' }} />} placeholder="name@company.com" style={{ borderRadius: '8px' }} disabled={loading} />
-                    </Form.Item>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label className="small fw-semibold text-secondary">Email Address</Form.Label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <i className="bi bi-envelope text-muted"></i>
+                                            </span>
+                                            <Form.Control
+                                                type="email"
+                                               
+                                                className="bg-light border-start-0 ps-0"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </Form.Group>
 
-                    <Form.Item
-                        label="Password"
-                        name="password"
-                        rules={[
-                            { required: true, message: 'Please input your password!' },
-                            { min: 6, message: 'Password must be at least 6 characters!' }
-                        ]}
-                    >
-                        <Input.Password prefix={<LockOutlined style={{ color: '#94a3b8' }} />} placeholder="••••••••" style={{ borderRadius: '8px' }} disabled={loading} />
-                    </Form.Item>
+                                    <Form.Group className="mb-4">
+                                        <Form.Label className="small fw-semibold text-secondary">Password</Form.Label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <i className="bi bi-lock text-muted"></i>
+                                            </span>
+                                            <Form.Control
+                                                type="password"
+                                               
+                                                className="bg-light border-start-0 ps-0"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                required
+                                                minLength={6}
+                                            />
+                                        </div>
+                                        <Form.Text className="text-muted small">
+                                            Must be at least 6 characters.
+                                        </Form.Text>
+                                    </Form.Group>
 
-                    <Form.Item style={{ marginTop: 8 }}>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            block
-                            // loading={loading}
-                            style={{
-                                height: '48px',
-                                fontSize: '16px',
-                                fontWeight: 600,
-                                borderRadius: '8px',
-                                background: '#4f46e5',
-                                border: 'none',
-                                boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.4)',
-                                marginTop: '24px'
-                            }}
-                        >
-                            Create Account
-                        </Button>
-                    </Form.Item>
+                                    <Button
+                                        variant="primary"
+                                        type="submit"
+                                        className="w-100 py-2 fw-bold shadow-sm rounded-3 mb-3 d-flex align-items-center justify-content-center"
+                                        disabled={loading}
+                                    >
+                                        {loading ? <Spinner animation="border" size="sm" className="me-2" /> : 'Create Account'}
+                                    </Button>
 
-                    <div style={{ textAlign: 'center', marginTop: 16 }}>
-                        <Text type="secondary">Already have an account? </Text>
-                        <Button type="link" onClick={() => navigate('/login')} style={{ padding: 0 }}>
-                            Sign in instead
-                        </Button>
-                    </div>
-                </Form>
-            </Card>
+                                    <div className="text-center">
+                                       
+                                        <Button
+                                            variant="link"
+                                            className="p-0 small fw-semibold text-decoration-none"
+                                            onClick={() => navigate('/login')}
+                                        >
+                                            Sign in 
+                                        </Button>
+                                    </div>
+                                </Form>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
         </div>
     );
 };

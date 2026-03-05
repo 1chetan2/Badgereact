@@ -1,114 +1,56 @@
 import React from 'react';
-import { Layout, Menu, theme } from 'antd';
-import {
-    DashboardOutlined,
-    FileImageOutlined,
-    AppstoreAddOutlined,
-    ProfileOutlined,
-    TeamOutlined
-} from '@ant-design/icons';
+import { Nav } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
-const { Sider } = Layout;
 
 const Sidebar = ({ collapsed }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { hasRole } = useAuth();
 
-    const { token } = theme.useToken();
-
-  
     const isAdmin = hasRole('Admin') || hasRole('OrganizationAdmin') || hasRole('OrgAdmin');
 
-    const getMenuItems = () => {
-       
-        const items = [
-            {
-                key: '/dashboard',
-                icon: <DashboardOutlined />,
-                label: 'Dashboard',
-            },
-        ];
-
-        if (isAdmin) {
-            items.push({
-                key: '/templates',
-                icon: <FileImageOutlined />,
-                label: 'Templates',
-            });
-        }
-
-        items.push({
-            key: '/generate',
-            icon: <AppstoreAddOutlined />,
-            label: 'Generate',
-        });
-        items.push({
-            key: '/jobs',
-            icon: <ProfileOutlined />,
-            label: 'Jobs',
-        });
-
-        if (isAdmin) {
-            items.push({
-                key: '/users',
-                icon: <TeamOutlined />,
-                label: 'Users',
-            });
-        }
-
-        return items;
-    };
+    const menuItems = [
+        { path: '/dashboard', label: 'Dashboard', icon: 'bi-speedometer2' },
+        ...(isAdmin ? [{ path: '/templates', label: 'Templates', icon: 'bi-file-earmark-image' }] : []),
+        { path: '/generate', label: 'Generate', icon: 'bi-plus-square' },
+        { path: '/jobs', label: 'Jobs', icon: 'bi-list-ul' },
+        ...(isAdmin ? [{ path: '/users', label: 'Users', icon: 'bi-people' }] : []),
+    ];
 
     return (
-        <Sider
-            trigger={null}
-            collapsible
-            collapsed={collapsed}
-            theme="light"
+        <div
+            className="bg-white border-end shadow-sm flex-shrink-0"
             style={{
-                overflow: 'auto',
+                width: collapsed ? '80px' : '250px',
                 height: '100vh',
                 position: 'fixed',
-                left: 0,
-                top: 0,         
-                bottom: 0,
-                borderRight: `1px solid ${token.colorBorderSecondary}`,
-                boxShadow: '2px 0 8px 0 rgba(29,35,41,.05)'
+                transition: 'width 0.3s ease',
+                zIndex: 1000,
+                overflowX: 'hidden'
             }}
         >
-            <div style={{
-                height: 64,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '16px',
-                background: 'rgba(0, 0, 0, 0.04)',
-                borderRadius: token.borderRadiusLG,
-                overflow: 'hidden'
-            }}>
-                <span style={{
-                    color: token.colorPrimary,
-                    fontWeight: 700,
-                    fontSize: collapsed ? '12px' : '18px',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 0.2s'
-                }}>
+            <div className="d-flex align-items-center justify-content-center p-3 mb-3 border-bottom" style={{ height: '64px' }}>
+                <span className="h5 mb-0 fw-bold text-primary">
                     {collapsed ? 'BC' : 'BadgeCraft'}
                 </span>
             </div>
 
-            <Menu
-                theme="light"
-                mode="inline"
-                selectedKeys={[location.pathname]}
-                items={getMenuItems()}
-                onClick={({ key }) => navigate(key)}
-                style={{ borderRight: 0 }}
-            />
-        </Sider>
+            <Nav className="flex-column px-2">
+                {menuItems.map((item) => (
+                    <Nav.Link
+                        key={item.path}
+                        onClick={() => navigate(item.path)}
+                        className={`d-flex align-items-center mb-1 rounded p-2 ${location.pathname === item.path ? 'bg-primary text-white shadow-sm' : 'text-dark hover-bg-light'
+                            }`}
+                        style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                    >
+                        <i className={`bi ${item.icon} ${collapsed ? 'mx-auto fs-4' : 'me-3 fs-5'}`}></i>
+                        {!collapsed && <span>{item.label}</span>}
+                    </Nav.Link>
+                ))}
+            </Nav>
+        </div>
     );
 };
 

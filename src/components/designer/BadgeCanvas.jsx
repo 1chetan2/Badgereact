@@ -47,7 +47,7 @@ const BadgeCanvas = ({
     // Calculate dynamic styles for the RND element to reflect formatting props
     const getFieldStyle = (field, isSelected) => {
         return {
-            border: isSelected ? '2px dashed #1890ff' : '1px dashed transparent',
+            border: isSelected ? '2px solid #4f46e5' : '1px dashed #ced4da',
             fontFamily: field.fontFamily || 'Arial, sans-serif',
             fontSize: `${field.fontSize || 14}px`,
             color: field.fontColor || '#000000',
@@ -60,9 +60,11 @@ const BadgeCanvas = ({
                 field.textAlign === 'right' ? 'flex-end' : 'flex-start',
             cursor: 'move',
             userSelect: 'none',
-            overflow: 'hidden', // Prevent text from escaping boundaries
-            backgroundColor: isSelected ? 'rgba(24, 144, 255, 0.1)' : 'transparent',
-            padding: '2px'
+            overflow: 'hidden',
+            backgroundColor: isSelected ? 'rgba(79, 70, 229, 0.08)' : 'rgba(255, 255, 255, 0.5)',
+            transition: 'background-color 0.2s ease, border 0.1s ease',
+            padding: '2px',
+            borderRadius: '4px'
         };
     };
 

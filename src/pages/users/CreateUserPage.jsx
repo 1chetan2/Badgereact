@@ -1,144 +1,147 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message, Select, Row, Col } from 'antd';
-import {
-    UserOutlined,
-    MailOutlined,
-    LockOutlined,
-    ArrowLeftOutlined
-} from '@ant-design/icons';
+import { Form, Button, Card, Row, Col, Spinner, Alert, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
-const { Title, Text } = Typography;
-const { Option } = Select;
-
 const CreateUserPage = () => {
     const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'User'
+    });
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const onFinish = async (values) => {
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setLoading(true);
+        setError('');
         try {
-            // Posting to backend User creation endpoint
-            await api.post('/users', {
-                name: values.name,
-                email: values.email,
-                password: values.password,
-                role: values.role,
-            });
-
-            message.success('User created successfully!');
+            await api.post('/users', formData);
             navigate('/users');
-
         } catch (error) {
             console.error('Create user error:', error);
-            const errorMsg = error.response?.data?.message ||
-                (typeof error.response?.data === 'string' ? error.response.data : undefined) ||
-                'Failed to create user. Please check the details.';
-
-            message.error(errorMsg);
+            setError(error.response?.data?.message || 'Failed to create user.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100%' }}>
-            <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center' }}>
-                <Button
-                    type="text"
-                    icon={<ArrowLeftOutlined />}
-                    onClick={() => navigate('/users')}
-                    style={{ marginRight: 16 }}
-                />
+        <div>
+            <div className="mb-4 d-flex align-items-center">
+                <Button variant="link" className="text-dark p-0 me-3" onClick={() => navigate('/users')}>
+                    <i className="bi bi-arrow-left fs-4"></i>
+                </Button>
                 <div>
-                    <Title level={2} style={{ margin: 0, color: '#1f2937' }}>Create User</Title>
-                    {/* <Text type="secondary">Add a new member to your organization.</Text> */}
+                    <h2 className="fw-bold text-dark mb-0">Create User</h2>
+                    <p className="text-secondary mb-0">Add a new member to your organization.</p>
                 </div>
             </div>
 
-            <Row justify="center">
-                <Col xs={24} sm={20} md={16} lg={12}>
-                    <Card style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', border: 'none' }}>
-                        <Form
-                            name="create_user_form"
-                            layout="vertical"
-                            onFinish={onFinish}
-                            size="large"
-                            initialValues={{ role: 'User' }} // Set a default appropriate behavior
-                        >
-                            <Form.Item
-                                name="name"
-                                label="Full Name"
-                                rules={[{ required: true, message: 'Please input the full name!' }]}
-                            >
-                                <Input
-                                    prefix={<UserOutlined style={{ color: '#bfbfbf' }} />}
-                                    placeholder="Enter full name"
-                                    disabled={loading}
-                                />
-                            </Form.Item>
+            <Row className="justify-content-center">
+                <Col lg={7}>
+                    <Card className="shadow-sm border-0 rounded-4">
+                        <Card.Body className="p-4 p-md-5">
+                            {error && <Alert variant="danger" className="py-2 small">{error}</Alert>}
 
-                            <Form.Item
-                                name="email"
-                                label="Email Address"
-                                rules={[
-                                    { required: true, message: 'Please input the email address!' },
-                                    { type: 'email', message: 'Please enter a valid email format!' }
-                                ]}
-                            >
-                                <Input
-                                    prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
-                                    placeholder="xyz@example.com"
-                                    disabled={loading}
-                                />
-                            </Form.Item>
+                            <Form onSubmit={handleSubmit}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="small fw-semibold text-secondary">Full Name</Form.Label>
+                                    <div className="input-group">
+                                        <span className="input-group-text bg-light border-end-0 text-muted">
+                                            <i className="bi bi-person"></i>
+                                        </span>
+                                        <Form.Control
+                                            name="name"
+                                            type="text"
+                                            placeholder="Enter full name"
+                                            className="bg-light border-start-0 ps-0"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                </Form.Group>
 
-                            <Form.Item
-                                name="password"
-                                label="Temporary Password"
-                                rules={[
-                                    { required: true, message: 'Please input a password!' },
-                                    { min: 6, message: 'Password must be at least 6 characters!' }
-                                ]}
-                            >
-                                <Input.Password
-                                    prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
-                                    placeholder="Enter a secure password"
-                                    disabled={loading}
-                                />
-                            </Form.Item>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="small fw-semibold text-secondary">Email Address</Form.Label>
+                                    <div className="input-group">
+                                        <span className="input-group-text bg-light border-end-0 text-muted">
+                                            <i className="bi bi-envelope"></i>
+                                        </span>
+                                        <Form.Control
+                                            name="email"
+                                            type="email"
+                                            placeholder="xyz@example.com"
+                                            className="bg-light border-start-0 ps-0"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                </Form.Group>
 
-                            <Form.Item
-                                name="role"
-                                label="User Role"
-                                rules={[{ required: true, message: 'Please select a role!' }]}
-                            >
-                                <Select disabled={loading} placeholder="Select a role">
-                                    <Option value="User">User</Option>
-                                    <Option value="Admin">Admin</Option>
-                                    <Option value="OrganizationAdmin">Organization Admin</Option>
-                                </Select>
-                            </Form.Item>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="small fw-semibold text-secondary">Temporary Password</Form.Label>
+                                    <div className="input-group">
+                                        <span className="input-group-text bg-light border-end-0 text-muted">
+                                            <i className="bi bi-lock"></i>
+                                        </span>
+                                        <Form.Control
+                                            name="password"
+                                            type="password"
+                                            placeholder="Enter a secure password"
+                                            className="bg-light border-start-0 ps-0"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            required
+                                            minLength={6}
+                                        />
+                                    </div>
+                                </Form.Group>
 
-                            <Form.Item style={{ marginTop: 32, marginBottom: 0, textAlign: 'right' }}>
-                                <Button
-                                    onClick={() => navigate('/users')}
-                                    style={{ marginRight: 16 }}
-                                    disabled={loading}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    loading={loading}
-                                    style={{ borderRadius: 6 }}
-                                >
-                                    Create User
-                                </Button>
-                            </Form.Item>
-                        </Form>
+                                <Form.Group className="mb-4">
+                                    <Form.Label className="small fw-semibold text-secondary">User Role</Form.Label>
+                                    <Form.Select
+                                        name="role"
+                                        className="bg-light border-0"
+                                        value={formData.role}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="User">User</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="OrganizationAdmin">Organization Admin</option>
+                                    </Form.Select>
+                                </Form.Group>
+
+                                <div className="d-flex justify-content-end gap-2 pt-2">
+                                    <Button
+                                        variant="light"
+                                        className="px-4 rounded-pill fw-semibold"
+                                        onClick={() => navigate('/users')}
+                                        disabled={loading}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        type="submit"
+                                        className="px-4 rounded-pill fw-bold shadow-sm"
+                                        disabled={loading}
+                                    >
+                                        {loading ? <Spinner animation="border" size="sm" className="me-2" /> : <i className="bi bi-plus-lg me-2"></i>}
+                                        Create User
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Card.Body>
                     </Card>
                 </Col>
             </Row>

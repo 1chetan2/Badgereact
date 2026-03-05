@@ -1,240 +1,206 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Card, Typography, Select, Upload, Button,
-    message, Table, Steps, Result, Space
-} from 'antd';
-import {
-    InboxOutlined,
-    FileTextOutlined,
-    ArrowRightOutlined
-} from '@ant-design/icons';
+import { Card, Form, Button, Row, Col, Table, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
-const { Title, Text } = Typography;
-const { Dragger } = Upload;
-const { Option } = Select;
-
 const CsvUploadPage = () => {
     const [templates, setTemplates] = useState([]);
-    const [selectedTemplateId, setSelectedTemplateId] = useState(null);
-    const [fileList, setFileList] = useState([]);
+    const [selectedTemplateId, setSelectedTemplateId] = useState('');
+    const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
-
-    // Preview states
-    const [previewData, setPreviewData] = useState(null); // { columns: [], rows: [] }
+    const [previewData, setPreviewData] = useState(null);
     const [jobId, setJobId] = useState(null);
+    const [error, setError] = useState('');
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch published templates to populate the dropdown
         const fetchTemplates = async () => {
             try {
                 const response = await api.get('/BadgeTemplates');
                 setTemplates(response.data || []);
             } catch (error) {
                 console.error('Failed to fetch templates:', error);
-                message.error('Could not load templates.');
             }
         };
-
         fetchTemplates();
     }, []);
 
-    // File selection config and validation
-    const uploadProps = {
-        onRemove: () => {
-            setFileList([]);
-        },
-        beforeUpload: (file) => {
-            const isCSV = file.type === 'text/csv' || file.name.endsWith('.csv');
-            if (!isCSV) {
-                message.error('You can only upload CSV files!');
-                return Upload.LIST_IGNORE;
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            if (!selectedFile.name.endsWith('.csv')) {
+                setError('Please select a CSV file.');
+                setFile(null);
+                return;
             }
-
-            // Validate size 
-            const isLt5M = file.size / 1024 / 1024 < 5;
-            if (!isLt5M) {
-                message.error('CSV must smaller than 5MB!');
-                return Upload.LIST_IGNORE;
+            if (selectedFile.size > 5 * 1024 * 1024) {
+                setError('File size must be less than 5MB.');
+                setFile(null);
+                return;
             }
-
-            setFileList([file]);
-            return false; // Prevent Ant's default immediate POST upload
-        },
-        maxCount: 1,
-        fileList,
+            setFile(selectedFile);
+            setError('');
+        }
     };
 
     const handleUpload = async () => {
-        if (!selectedTemplateId) {
-            message.warning('Please select a template first.');
-            return;
-        }
-
-        if (fileList.length === 0) {
-            message.warning('Please select a CSV file to upload.');
+        if (!selectedTemplateId || !file) {
+            setError('Please select both a template and a file.');
             return;
         }
 
         const formData = new FormData();
-        formData.append('file', fileList[0]);
+        formData.append('file', file);
         formData.append('templateId', selectedTemplateId);
 
         setUploading(true);
+        setError('');
         try {
-            // Send the multipart/form-data request
-            const uploadResponse = await api.post('/Csv/upload', formData, {
+            const response = await api.post('/Csv/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-
-            message.success('CSV uploaded successfully!');
-            const newJobId = uploadResponse.data.jobId || uploadResponse.data.id;
+            const newJobId = response.data.jobId || response.data.id;
             setJobId(newJobId);
-
-  
             fetchPreview(newJobId);
-
         } catch (error) {
-            console.error('CSV upload error:', error);
-            const errorMsg = error.response?.data?.message || 'Failed to upload CSV file.';
-            message.error(errorMsg);
+            console.error('Upload error:', error);
+            setError('Failed to upload CSV. Please try again.');
             setUploading(false);
         }
     };
 
     const fetchPreview = async (id) => {
         try {
-            const previewResponse = await api.get(`/Csv/${id}/preview`);
-
-            
-
-            if (previewResponse.data && previewResponse.data.length > 0) {
-                const firstRow = previewResponse.data[0];
-                const columnKeys = Object.keys(firstRow);
-
-                const columns = columnKeys.map((key) => ({
-                    title: key,
-                    dataIndex: key,
-                    key: key,
-                }));
-
-                const rows = previewResponse.data.map((row, idx) => ({
-                    ...row,
-                    key: `row_${idx}`
-                }));
-
-                setPreviewData({ columns, rows });
+            const response = await api.get(`/Csv/${id}/preview`);
+            if (response.data && response.data.length > 0) {
+                const columns = Object.keys(response.data[0]);
+                setPreviewData({ columns, rows: response.data });
             } else {
                 setPreviewData({ columns: [], rows: [] });
             }
         } catch (error) {
-            console.error('Failed to fetch preview:', error);
-            message.error('Could not load CSV preview.');
+            setError('Could not load preview.');
         } finally {
             setUploading(false);
         }
     };
 
-    // If preview exists, show the mapping/preview screen
     if (previewData && jobId) {
         return (
-            <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100%' }}>
-                <Result
-                    status="success"
-                    title={<span style={{ color: '#1f2937' }}>Upload processing complete!</span>}
-                    subTitle="Review the parsed CSV data below. Next, you'll map these columns to your template fields."
-                    extra={[
-                        <Button
-                            key="cancel"
-                            onClick={() => {
-                                setPreviewData(null);
-                                setJobId(null);
-                                setFileList([]);
-                            }}
-                        >
+            <div>
+                <div className="text-center mb-5 py-4 bg-white rounded-4 shadow-sm border">
+                    <div className="mb-3">
+                        <i className="bi bi-check-circle-fill text-success display-4"></i>
+                    </div>
+                    <h2 className="fw-bold">Upload Successful!</h2>
+                    <p className="text-secondary mb-4">Review the parsed CSV data below before proceeding.</p>
+                    <div className="d-flex justify-content-center gap-3">
+                        <Button variant="light" onClick={() => { setPreviewData(null); setJobId(null); setFile(null); }} className="rounded-pill px-4">
                             Start Over
-                        </Button>,
-                        <Button
-                            type="primary"
-                            key="map"
-                            icon={<ArrowRightOutlined />}
-                            onClick={() => navigate(`/uploads/mapping/${jobId}`)}
-                        >
-                            Proceed to Column Mapping
-                        </Button>,
-                    ]}
-                />
+                        </Button>
+                        <Button variant="primary" onClick={() => navigate(`/uploads/mapping/${jobId}`)} className="rounded-pill px-4">
+                            Proceed to Mapping <i className="bi bi-arrow-right ms-2"></i>
+                        </Button>
+                    </div>
+                </div>
 
-                <Card title={<><FileTextOutlined style={{ marginRight: 8 }} /> CSV Data Preview (Top 5 rows)</>} style={{ marginTop: 24, borderRadius: '8px' }}>
-                    <Table
-                        dataSource={previewData.rows}
-                        columns={previewData.columns}
-                        pagination={false}
-                        scroll={{ x: true }}
-                        size="small"
-                        bordered
-                    />
+                <Card className="shadow-sm border-0 rounded-4 overflow-hidden">
+                    <Card.Header className="bg-white border-bottom py-3 px-4">
+                        <h5 className="mb-0 fw-bold"><i className="bi bi-table me-2 text-primary"></i> Data Preview</h5>
+                    </Card.Header>
+                    <Card.Body className="p-0">
+                        <div className="table-responsive">
+                            <Table hover className="mb-0 small align-middle">
+                                <thead className="bg-light text-secondary">
+                                    <tr>
+                                        {previewData.columns.map(col => <th key={col} className="px-4 py-3 border-0">{col}</th>)}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {previewData.rows.map((row, idx) => (
+                                        <tr key={idx}>
+                                            {previewData.columns.map(col => <td key={col} className="px-4 py-3 border-bottom-0 text-secondary">{row[col]}</td>)}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </div>
+                    </Card.Body>
                 </Card>
             </div>
         );
     }
 
-    // Default Upload Screen
     return (
-        <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100%' }}>
-
-            <div style={{ marginBottom: 32 }}>
-                <Title level={2} style={{ margin: 0, color: '#1f2937' }}>Upload Data</Title>
-                <Text type="secondary">Select a template and securely upload your CSV attendee list.</Text>
+        <div>
+            <div className="mb-4">
+                <h2 className="fw-bold text-dark">Upload Attendees</h2>
+                <p className="text-secondary">Select a template and securely upload your CSV attendee list.</p>
             </div>
 
-            <Card style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', border: 'none', maxWidth: '800px', margin: '0 auto' }}>
-                <div style={{ marginBottom: 24 }}>
-                    <Text strong style={{ display: 'block', marginBottom: 8 }}>1. Select Badge Template</Text>
-                    <Select
-                        style={{ width: '100%' }}
-                        placeholder="Choose the desired layout template"
-                        size="large"
-                        onChange={setSelectedTemplateId}
-                        value={selectedTemplateId}
-                    >
-                        {templates.map(tpl => (
-                            <Option key={tpl.id} value={tpl.id}>
-                                {tpl.name} {tpl.status === 'Draft' ? '(Draft)' : ''}
-                            </Option>
-                        ))}
-                    </Select>
-                </div>
+            <Row className="justify-content-center">
+                <Col lg={8}>
+                    <Card className="shadow-sm border-0 rounded-4">
+                        <Card.Body className="p-4 p-md-5">
+                            {error && <Alert variant="danger" className="py-2 small">{error}</Alert>}
 
-                <div style={{ marginBottom: 32 }}>
-                    <Text strong style={{ display: 'block', marginBottom: 8 }}>2. Upload CSV File</Text>
-                    <Dragger {...uploadProps}>
-                        <p className="ant-upload-drag-icon">
-                            <InboxOutlined style={{ color: '#1890ff' }} />
-                        </p>
-                        <p className="ant-upload-text">Click or drag CSV file to this area to upload</p>
-                        <p className="ant-upload-hint">
-                            Strictly prohibit from uploading company data or other band files.
-                            Maximum size is 5MB.
-                        </p>
-                    </Dragger>
-                </div>
+                            <Form.Group className="mb-4">
+                                <Form.Label className="fw-semibold text-dark mb-2">1. Select Badge Template</Form.Label>
+                                <Form.Select
+                                    size="lg"
+                                    className="bg-light border-0 rounded-3"
+                                    value={selectedTemplateId}
+                                    onChange={(e) => setSelectedTemplateId(e.target.value)}
+                                >
+                                    <option value="">Choose a template...</option>
+                                    {templates.map(t => (
+                                        <option key={t.id} value={t.id}>{t.name} {t.status === 'Draft' ? '(Draft)' : ''}</option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
 
-                <Button
-                    type="primary"
-                    size="large"
-                    block
-                    loading={uploading}
-                    onClick={handleUpload}
-                    disabled={fileList.length === 0 || !selectedTemplateId}
-                    style={{ borderRadius: '6px' }}
-                >
-                    {uploading ? 'Processing Data...' : 'Upload & Preview'}
-                </Button>
-            </Card>
+                            <Form.Group className="mb-5">
+                                <Form.Label className="fw-semibold text-dark mb-2">2. Upload CSV File</Form.Label>
+                                <div
+                                    className="border-2 border-dashed rounded-4 p-5 text-center bg-light cursor-pointer hover-bg-light-plus"
+                                    style={{ borderStyle: 'dashed', borderColor: '#dee2e6' }}
+                                    onClick={() => document.getElementById('csvFileInput').click()}
+                                >
+                                    <input
+                                        type="file"
+                                        id="csvFileInput"
+                                        className="d-none"
+                                        accept=".csv"
+                                        onChange={handleFileChange}
+                                    />
+                                    <i className="bi bi-cloud-arrow-up display-3 text-primary opacity-50 mb-3"></i>
+                                    {file ? (
+                                        <div className="fw-bold text-primary">{file.name}</div>
+                                    ) : (
+                                        <>
+                                            <p className="mb-1 fw-medium text-dark">Click to browse or drag and drop</p>
+                                            <p className="text-muted small mb-0">Only CSV files supported (Max 5MB)</p>
+                                        </>
+                                    )}
+                                </div>
+                            </Form.Group>
+
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                className="w-100 py-3 fw-bold rounded-3 shadow-sm border-0"
+                                onClick={handleUpload}
+                                disabled={uploading || !file || !selectedTemplateId}
+                            >
+                                {uploading ? (
+                                    <><Spinner animation="border" size="sm" className="me-2" /> Processing...</>
+                                ) : 'Next: Parse & Preview'}
+                            </Button>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
         </div>
     );
 };

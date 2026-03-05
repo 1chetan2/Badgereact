@@ -1,151 +1,220 @@
-import React, { useEffect } from 'react';
-import { Card, Form, Input, InputNumber, Typography, Divider, Select, Switch, Row, Col } from 'antd';
-
-const { Title, Text } = Typography;
-const { Option } = Select;
+import React from 'react';
+import { Card, Form, Row, Col } from 'react-bootstrap';
 
 const PropertiesPanel = ({ selectedField, onUpdateField }) => {
-    const [form] = Form.useForm();
-
-    // Re-initialize the form when a different field is clicked on the canvas
-    useEffect(() => {
-        if (selectedField) {
-            form.setFieldsValue({
-                x: Math.round(selectedField.x),
-                y: Math.round(selectedField.y),
-                width: Math.round(selectedField.width),
-                height: Math.round(selectedField.height),
-                fontSize: selectedField.fontSize || 14,
-                fontColor: selectedField.fontColor || '#000000',
-                fontFamily: selectedField.fontFamily || 'Arial, sans-serif',
-                textAlign: selectedField.textAlign || 'left',
-                isBold: selectedField.isBold || false,
-                isItalic: selectedField.isItalic || false,
-                sampleText: selectedField.sampleText || '',
-            });
-        } else {
-            form.resetFields();
-        }
-    }, [selectedField, form]);
-
-
-    const handleValuesChange = (changedValues) => {
-        if (selectedField) {
-            
-            onUpdateField(selectedField.id, changedValues);
-        }
-    };
 
     if (!selectedField) {
         return (
-            <Card
-                title={<Title level={5} style={{ margin: 0 }}>Properties</Title>}
-                style={{ height: '100%', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', border: 'none' }}
-                bodyStyle={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100% - 58px)' }}
-            >
-                <Text type="secondary">Select an element on the canvas to edit its properties.</Text>
+            <Card className="h-100 border-0 shadow-sm rounded-0">
+                <Card.Header className="bg-white border-bottom py-3">
+                    <h6 className="mb-0 fw-bold">Properties</h6>
+                </Card.Header>
+                <Card.Body className="d-flex align-items-center justify-content-center text-center p-4">
+                    <div className="text-secondary opacity-75">
+                        <i className="bi bi-cursor-fill display-6 mb-3 d-block"></i>
+                        <p className="small mb-0">Select an element on the canvas to edit its properties.</p>
+                    </div>
+                </Card.Body>
             </Card>
         );
     }
 
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        let val = type === 'checkbox' ? checked : value;
+
+        // Handle numeric inputs
+        if (['x', 'y', 'width', 'height', 'fontSize'].includes(name)) {
+            val = val === '' ? 0 : parseFloat(val);
+        }
+
+        onUpdateField(selectedField.id, { [name]: val });
+    };
+
     return (
-        <Card
-            title={<Title level={5} style={{ margin: 0 }}>Properties: {selectedField.name}</Title>}
-            style={{
-                height: '100%',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                border: 'none',
-                overflowY: 'auto'
-            }}
-            bodyStyle={{ padding: '16px' }}
-        >
-            <Form
-                form={form}
-                layout="vertical"
-                onValuesChange={handleValuesChange}
-                size="middle"
-            >
-              
-                <Divider orientation="left" style={{ marginTop: 0 }}>Dimensions (%)</Divider>
-                <Row gutter={12}>
-                    <Col span={12}>
-                        <Form.Item label="X Pos" name="x">
-                            <InputNumber min={0} max={100} style={{ width: '100%' }} />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item label="Y Pos" name="y">
-                            <InputNumber min={0} max={100} style={{ width: '100%' }} />
-                        </Form.Item>
-                    </Col>
-                </Row>
-                <Row gutter={12}>
-                    <Col span={12}>
-                        <Form.Item label="Width" name="width">
-                            <InputNumber min={1} max={100} style={{ width: '100%' }} />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item label="Height" name="height">
-                            <InputNumber min={1} max={100} style={{ width: '100%' }} />
-                        </Form.Item>
-                    </Col>
-                </Row>
-
-               
-                {selectedField.type === 'TEXT' && (
-                    <>
-                        <Divider orientation="left">Text Formatting</Divider>
-                        <Form.Item label="Sample Text" name="sampleText">
-                            <Input placeholder="E.g. Attendee Name" />
-                        </Form.Item>
-
-                        <Row gutter={12}>
-                            <Col span={12}>
-                                <Form.Item label="Font Size (px)" name="fontSize">
-                                    <InputNumber min={6} max={120} style={{ width: '100%' }} />
-                                </Form.Item>
+        <Card className="h-100 border-0 shadow-sm rounded-0 overflow-auto">
+            <Card.Header className="bg-white border-bottom py-3 d-flex align-items-center">
+                <i className="bi bi-sliders2 me-2 text-primary"></i>
+                <h6 className="mb-0 fw-bold">Properties: {selectedField.type}</h6>
+            </Card.Header>
+            <Card.Body className="p-3">
+                <Form>
+                    <div className="mb-4">
+                        <div className="d-flex align-items-center mb-3">
+                            <hr className="flex-grow-1 my-0" />
+                            <span className="mx-2 small fw-bold text-muted text-uppercase tracking-wider">Dimensions (%)</span>
+                            <hr className="flex-grow-1 my-0" />
+                        </div>
+                        <Row className="g-3 mb-3">
+                            <Col xs={6}>
+                                <Form.Group>
+                                    <Form.Label className="small text-secondary fw-semibold">X Pos</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        name="x"
+                                        size="sm"
+                                        className="bg-light border-0"
+                                        value={Math.round(selectedField.x)}
+                                        onChange={handleChange}
+                                        min={0} max={100}
+                                    />
+                                </Form.Group>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Color" name="fontColor">
-                                    <Input type="color" style={{ width: '100%', padding: '0 4px' }} />
-                                </Form.Item>
+                            <Col xs={6}>
+                                <Form.Group>
+                                    <Form.Label className="small text-secondary fw-semibold">Y Pos</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        name="y"
+                                        size="sm"
+                                        className="bg-light border-0"
+                                        value={Math.round(selectedField.y)}
+                                        onChange={handleChange}
+                                        min={0} max={100}
+                                    />
+                                </Form.Group>
                             </Col>
                         </Row>
-
-                        <Form.Item label="Alignment" name="textAlign">
-                            <Select>
-                                <Option value="left">Left</Option>
-                                <Option value="center">Center</Option>
-                                <Option value="right">Right</Option>
-                            </Select>
-                        </Form.Item>
-
-                        <Row gutter={12}>
-                            <Col span={12}>
-                                <Form.Item label="Bold" name="isBold" valuePropName="checked">
-                                    <Switch />
-                                </Form.Item>
+                        <Row className="g-3">
+                            <Col xs={6}>
+                                <Form.Group>
+                                    <Form.Label className="small text-secondary fw-semibold">Width</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        name="width"
+                                        size="sm"
+                                        className="bg-light border-0"
+                                        value={Math.round(selectedField.width)}
+                                        onChange={handleChange}
+                                        min={1} max={100}
+                                    />
+                                </Form.Group>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Italic" name="isItalic" valuePropName="checked">
-                                    <Switch />
-                                </Form.Item>
+                            <Col xs={6}>
+                                <Form.Group>
+                                    <Form.Label className="small text-secondary fw-semibold">Height</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        name="height"
+                                        size="sm"
+                                        className="bg-light border-0"
+                                        value={Math.round(selectedField.height)}
+                                        onChange={handleChange}
+                                        min={1} max={100}
+                                    />
+                                </Form.Group>
                             </Col>
                         </Row>
+                    </div>
 
-                        <Form.Item label="Font Family" name="fontFamily">
-                            <Select>
-                                <Option value="Arial, sans-serif">Arial</Option>
-                                <Option value="'Times New Roman', serif">Times New Roman</Option>
-                                <Option value="'Courier New', monospace">Courier New</Option>
-                                <Option value="'Lucida Console', monospace">Lucida Console</Option>
-                            </Select>
-                        </Form.Item>
-                    </>
-                )}
-            </Form>
+                    {selectedField.type === 'TEXT' && (
+                        <div className="animate-fade-in">
+                            <div className="d-flex align-items-center mb-3 mt-4">
+                                <hr className="flex-grow-1 my-0" />
+                                <span className="mx-2 small fw-bold text-muted text-uppercase tracking-wider">Appearance</span>
+                                <hr className="flex-grow-1 my-0" />
+                            </div>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label className="small text-secondary fw-semibold">Sample Text</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="sampleText"
+                                    placeholder="Attendee Name"
+                                    className="bg-light border-0"
+                                    value={selectedField.sampleText || ''}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+
+                            <Row className="g-3 mb-3">
+                                <Col xs={6}>
+                                    <Form.Group>
+                                        <Form.Label className="small text-secondary fw-semibold">Font Size</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="fontSize"
+                                            size="sm"
+                                            className="bg-light border-0"
+                                            value={selectedField.fontSize || 14}
+                                            onChange={handleChange}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={6}>
+                                    <Form.Group>
+                                        <Form.Label className="small text-secondary fw-semibold">Color</Form.Label>
+                                        <div className="d-flex gap-2">
+                                            <Form.Control
+                                                type="color"
+                                                name="fontColor"
+                                                size="sm"
+                                                className="bg-light border-0 p-1"
+                                                style={{ height: '31px', width: '100%' }}
+                                                value={selectedField.fontColor || '#000000'}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label className="small text-secondary fw-semibold">Font Family</Form.Label>
+                                <Form.Select
+                                    name="fontFamily"
+                                    size="sm"
+                                    className="bg-light border-0"
+                                    value={selectedField.fontFamily || 'Arial, sans-serif'}
+                                    onChange={handleChange}
+                                >
+                                    <option value="Arial, sans-serif">Arial</option>
+                                    <option value="'Times New Roman', serif">Times New Roman</option>
+                                    <option value="'Courier New', monospace">Courier New</option>
+                                    <option value="'Inter', sans-serif">Inter</option>
+                                </Form.Select>
+                            </Form.Group>
+
+                            <Form.Group className="mb-4">
+                                <Form.Label className="small text-secondary fw-semibold">Alignment</Form.Label>
+                                <div className="btn-group w-100" role="group">
+                                    {['left', 'center', 'right'].map(align => (
+                                        <button
+                                            key={align}
+                                            type="button"
+                                            className={`btn btn-sm ${selectedField.textAlign === align ? 'btn-primary' : 'btn-light border text-muted'}`}
+                                            onClick={() => onUpdateField(selectedField.id, { textAlign: align })}
+                                        >
+                                            <i className={`bi bi-text-${align}`}></i>
+                                        </button>
+                                    ))}
+                                </div>
+                            </Form.Group>
+
+                            <div className="d-flex gap-4">
+                                <Form.Check
+                                    type="switch"
+                                    id="bold-switch"
+                                    label="Bold"
+                                    name="isBold"
+                                    className="small fw-semibold text-secondary"
+                                    checked={selectedField.isBold || false}
+                                    onChange={handleChange}
+                                />
+                                <Form.Check
+                                    type="switch"
+                                    id="italic-switch"
+                                    label="Italic"
+                                    name="isItalic"
+                                    className="small fw-semibold text-secondary"
+                                    checked={selectedField.isItalic || false}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </Form>
+            </Card.Body>
         </Card>
     );
 };

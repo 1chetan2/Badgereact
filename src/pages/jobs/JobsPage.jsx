@@ -1,26 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Typography, Tag, Button, Card, message } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { Table, Card, Button, Badge, Spinner, Pagination } from 'react-bootstrap';
 import api from '../../services/api';
-
-const { Title, Text } = Typography;
 
 const JobsPage = () => {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sortOrder, setSortOrder] = useState('desc'); // Toggle sort
+    const [currentPage, setCurrentPage] = useState(1);
+    const RECORDS_PER_PAGE = 6;
 
     const fetchJobs = async () => {
         setLoading(true);
         try {
             const response = await api.get('/jobs');
-            const dataWithKeys = (response.data || []).map(job => ({
-                ...job,
-                key: job.id || job._id
-            }));
-            setJobs(dataWithKeys);
+            setJobs(response.data || []);
         } catch (error) {
             console.error('Failed to fetch jobs:', error);
-            message.error('Could not load jobs history.');
         } finally {
             setLoading(false);
         }
@@ -32,95 +27,147 @@ const JobsPage = () => {
 
     const handleDownload = (job) => {
         const jobId = job.id || job._id;
-        if (job.downloadUrl) {
-            window.open(job.downloadUrl, '_blank');
-        } else {
-            const fullUrl = `${api.defaults.baseURL}/jobs/${jobId}/download`;
-            window.open(fullUrl, '_blank');
-        }
+        const fullUrl = `${api.defaults.baseURL}/jobs/${jobId}/download`;
+        window.open(fullUrl, '_blank');
     };
 
-    const columns = [
-        {
-            title: 'Job ID',
-            dataIndex: 'id',
-            key: 'id',
-            render: (text, record) => <Text strong>{record.id || record._id}</Text>,
-            sorter: (a, b) => (a.id || a._id) - (b.id || b._id),
-            defaultSortOrder: 'descend',
-        },
-        {
-            title: 'Template Name',
-            dataIndex: 'templateName',
-            key: 'templateName',
-            render: (text) => text || 'Unknown Template',
-        },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status) => {
-                let color = 'default';
-                if (status === 'Completed' || status === 'PdfGenerated') color = 'success';
-                if (status === 'Processing') color = 'processing';
-                if (status === 'Failed') color = 'error';
+    const sortedJobs = [...jobs].sort((a, b) => {
+        const idA = a.id || a._id;
+        const idB = b.id || b._id;
+        return sortOrder === 'asc' ? idA - idB : idB - idA;
+    });
 
-                return (
-                    <Tag color={color}>
-                        {status === 'PdfGenerated' ? 'Completed' : (status || 'Unknown')}
-                    </Tag>
-                );
-            },
-            filters: [
-                { text: 'Completed', value: 'Completed' },
-                { text: 'PdfGenerated', value: 'PdfGenerated' },
-                { text: 'Processing', value: 'Processing' },
-                { text: 'Failed', value: 'Failed' },
-                { text: 'Uploaded', value: 'Uploaded' },
-                { text: 'Mapped', value: 'Mapped' },
-            ],
-            onFilter: (value, record) => record.status === value,
-        },
-        {
-            title: 'Created At',
-            dataIndex: 'createdAt',
-            key: 'createdAt',
-            render: (date) => date ? new Date(date).toLocaleString() : 'N/A',
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <Button
-                    type="primary"
-                    icon={<DownloadOutlined />}
-                    disabled={record.status !== 'Completed' && record.status !== 'PdfGenerated'}
-                    onClick={() => handleDownload(record)}
-                >
-                    Download
-                </Button>
-            ),
-        },
-    ];
+    // Pagination Logic
+    const totalPages = Math.ceil(sortedJobs.length / RECORDS_PER_PAGE);
+    const indexOfLastRecord = currentPage * RECORDS_PER_PAGE;
+    const indexOfFirstRecord = indexOfLastRecord - RECORDS_PER_PAGE;
+    const currentRecords = sortedJobs.slice(indexOfFirstRecord, indexOfLastRecord);
+
+    const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleSortToggle = () => {
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        setCurrentPage(1); // Reset to first page on sort
+    };
+
+    const StatusBadge = ({ status }) => {
+        let variant = 'secondary';
+        let label = status || 'Unknown';
+
+        if (status === 'Completed' || status === 'PdfGenerated') {
+            variant = 'success';
+            label = 'Completed';
+        } else if (status === 'Processing') {
+            variant = 'info';
+        } else if (status === 'Failed') {
+            variant = 'danger';
+        }
+
+        return <Badge bg={variant} className="rounded-pill fw-medium">{label}</Badge>;
+    };
 
     return (
-        <div style={{ padding: '24px', background: '#f5f7fa', minHeight: '100%' }}>
-            <div style={{ marginBottom: 24 }}>
-                <Title level={2} style={{ margin: 0, color: '#1f2937' }}>Job History</Title>
-                {/*<Text type="secondary">View and download your previously generated badges.</Text>*/}
+        <div>
+            <div className="mb-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 className="fw-bold text-dark">Job History</h2>
+                    <p className="text-secondary">Track and download your badge generation jobs.</p>
+                </div>
             </div>
 
-            <Card style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', border: 'none' }}>
-                <Table
-                    columns={columns}
-                    dataSource={jobs}
-                    loading={loading}
-                    pagination={{ pageSize: 6 }}
-                    scroll={{ x: true }}
-                />
+            <Card className="shadow-sm border-0 rounded-4">
+                <Card.Body className="p-0">
+                    {loading ? (
+                        <div className="d-flex justify-content-center align-items-center p-5">
+                            <Spinner animation="border" variant="primary" />
+                        </div>
+                    ) : (
+                        <>
+                            <div className="table-responsive">
+                                <Table hover className="align-middle mb-0">
+                                    <thead className="bg-light text-secondary">
+                                        <tr>
+                                            <th
+                                                className="px-4 py-3 border-0 cursor-pointer"
+                                                onClick={handleSortToggle}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                Job ID <i className={`bi bi-sort-numeric-${sortOrder === 'asc' ? 'up' : 'down'} ms-1`}></i>
+                                            </th>
+                                            <th className="py-3 border-0">Template Name</th>
+                                            <th className="py-3 border-0">Status</th>
+                                            <th className="py-3 border-0">Created At</th>
+                                            <th className="px-4 py-3 border-0 text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {currentRecords.map((job) => (
+                                            <tr key={job.id || job._id}>
+                                                <td className="px-4 py-3 fw-semibold">#{job.id || job._id}</td>
+                                                <td className="py-3 text-secondary">{job.templateName || 'Unknown'}</td>
+                                                <td className="py-3">
+                                                    <StatusBadge status={job.status} />
+                                                </td>
+                                                <td className="py-3 text-secondary">
+                                                    {job.createdAt ? new Date(job.createdAt).toLocaleString() : 'N/A'}
+                                                </td>
+                                                <td className="px-4 py-3 text-end">
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        size="sm"
+                                                        disabled={job.status !== 'Completed' && job.status !== 'PdfGenerated'}
+                                                        onClick={() => handleDownload(job)}
+                                                        className="rounded-pill"
+                                                    >
+                                                        <i className="bi bi-download me-1"></i> Download
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {jobs.length === 0 && (
+                                            <tr>
+                                                <td colSpan="5" className="text-center py-5 text-secondary">
+                                                    No jobs found.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </Table>
+                            </div>
+
+                            {totalPages > 1 && (
+                                <div className="d-flex justify-content-between align-items-center p-3 border-top">
+                                    <small className="text-muted">
+                                        Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, sortedJobs.length)} of {sortedJobs.length} records
+                                    </small>
+                                    <Pagination className="mb-0">
+                                        <Pagination.Prev
+                                            disabled={currentPage === 1}
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                        />
+                                        {[...Array(totalPages)].map((_, idx) => (
+                                            <Pagination.Item
+                                                key={idx + 1}
+                                                active={idx + 1 === currentPage}
+                                                onClick={() => handlePageChange(idx + 1)}
+                                            >
+                                                {idx + 1}
+                                            </Pagination.Item>
+                                        ))}
+                                        <Pagination.Next
+                                            disabled={currentPage === totalPages}
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                        />
+                                    </Pagination>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </Card.Body>
             </Card>
         </div>
     );
 };
+
 
 export default JobsPage;
