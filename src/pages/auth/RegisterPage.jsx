@@ -29,7 +29,8 @@ const RegisterPage = () => {
             navigate('/login');
         } catch (error) {
             console.error('Registration error:', error);
-            setError(error.response?.data?.message || 'Registration failed. Please check your details.');
+            const errorMsg = error.response?.data?.message || error.response?.data || 'Registration failed. Please check your details.';
+            setError(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
         } finally {
             setLoading(false);
         }
@@ -42,7 +43,7 @@ const RegisterPage = () => {
                     <Col xs={12} sm={10} md={8} lg={6} xl={5}>
                         <div className="text-center mb-4">
                             <h1 className="fw-bold text-primary display-5 mb-1">BadgeCraft</h1>
-                           
+
                         </div>
 
                         <Card className="shadow border-0 rounded-4 overflow-hidden">
@@ -60,7 +61,7 @@ const RegisterPage = () => {
                                                     </span>
                                                     <Form.Control
                                                         type="text"
-                                                        
+
                                                         className="bg-light border-start-0 ps-0"
                                                         value={name}
                                                         onChange={(e) => setName(e.target.value)}
@@ -78,7 +79,7 @@ const RegisterPage = () => {
                                                     </span>
                                                     <Form.Control
                                                         type="text"
-                                                      
+
                                                         className="bg-light border-start-0 ps-0"
                                                         value={organizationName}
                                                         onChange={(e) => setOrganizationName(e.target.value)}
@@ -97,7 +98,7 @@ const RegisterPage = () => {
                                             </span>
                                             <Form.Control
                                                 type="email"
-                                               
+
                                                 className="bg-light border-start-0 ps-0"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
@@ -114,7 +115,7 @@ const RegisterPage = () => {
                                             </span>
                                             <Form.Control
                                                 type="password"
-                                               
+
                                                 className="bg-light border-start-0 ps-0"
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
@@ -137,13 +138,13 @@ const RegisterPage = () => {
                                     </Button>
 
                                     <div className="text-center">
-                                       
+
                                         <Button
                                             variant="link"
                                             className="p-0 small fw-semibold text-decoration-none"
                                             onClick={() => navigate('/login')}
                                         >
-                                            Sign in 
+                                            Sign in
                                         </Button>
                                     </div>
                                 </Form>

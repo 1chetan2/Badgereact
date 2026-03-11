@@ -98,25 +98,37 @@ const UsersListPage = () => {
                                 <Table hover className="align-middle mb-0">
                                     <thead className="bg-light text-secondary">
                                         <tr>
+                                            <th className="px-4 py-3 border-0">Full Name</th>
                                             <th
-                                                className="px-4 py-3 border-0 cursor-pointer"
+                                                className="py-3 border-0 cursor-pointer"
                                                 onClick={handleSortToggle}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 Email <i className={`bi bi-sort-alpha-${sortOrder === 'asc' ? 'down' : 'up'} ms-1`}></i>
                                             </th>
                                             <th className="py-3 border-0">Role</th>
+                                            <th className="py-3 border-0 text-center">Access</th>
+                                            <th className="py-3 border-0">Created At</th>
                                             <th className="px-4 py-3 border-0 text-end">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {currentRecords.map((user) => (
                                             <tr key={user.id || user._id}>
-                                                <td className="px-4 py-3 fw-medium">{user.email}</td>
+                                                <td className="px-4 py-3 fw-medium">{user.name || 'N/A'}</td>
+                                                <td className="py-3 text-secondary">{user.email}</td>
                                                 <td className="py-3">
-                                                    <Badge bg={user.role === 'Admin' || user.role === 'OrganizationAdmin' ? 'info' : 'secondary'} className="rounded-pill">
-                                                        {user.role || 'User'}
+                                                    <Badge bg={user.role === 'OrgAdmin' ? 'info' : 'secondary'} className="rounded-pill">
+                                                        {user.role === 'OrgAdmin' ? 'Admin' : 'Member'}
                                                     </Badge>
+                                                </td>
+                                                <td className="py-3 text-center">
+                                                    <Badge bg={user.isGranted ? 'success' : 'danger'} className="rounded-pill">
+                                                        {user.isGranted ? 'Granted' : 'Not Granted'}
+                                                    </Badge>
+                                                </td>
+                                                <td className="py-3 text-secondary small">
+                                                    {user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A'}
                                                 </td>
                                                 <td className="px-4 py-3 text-end">
                                                     <Button

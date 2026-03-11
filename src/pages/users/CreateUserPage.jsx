@@ -9,13 +9,18 @@ const CreateUserPage = () => {
         name: '',
         email: '',
         password: '',
-        role: 'User'
+        role: 'OrgUser',
+        isGranted: true
     });
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value, type } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === 'radio' ? value === 'true' : value
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -115,10 +120,32 @@ const CreateUserPage = () => {
                                         value={formData.role}
                                         onChange={handleChange}
                                     >
-                                        <option value="User">User</option>
-                                        <option value="Admin">Admin</option>
-                                        <option value="OrganizationAdmin">Organization Admin</option>
+                                        <option value="OrgUser">Organization Member</option>
+                                        <option value="OrgAdmin">Organization Admin</option>
                                     </Form.Select>
+                                </Form.Group>
+
+                                <Form.Group className="mb-4">
+                                    <Form.Label className="small fw-semibold text-secondary d-block">Account Access</Form.Label>
+                                    <div className="d-flex gap-3 mt-2">
+                                        <div
+                                            className={`flex-fill p-3 rounded-4 border-2 cursor-pointer text-center transition-all ${formData.isGranted ? 'border-primary bg-primary bg-opacity-10 text-primary fw-bold' : 'border-light bg-light text-secondary'}`}
+                                            onClick={() => setFormData({ ...formData, isGranted: true })}
+                                            style={{ transition: 'all 0.2s' }}
+                                        >
+                                            <i className="bi bi-check-circle-fill me-2"></i> Grant
+                                        </div>
+                                        <div
+                                            className={`flex-fill p-3 rounded-4 border-2 cursor-pointer text-center transition-all ${!formData.isGranted ? 'border-danger bg-danger bg-opacity-10 text-danger fw-bold' : 'border-light bg-light text-secondary'}`}
+                                            onClick={() => setFormData({ ...formData, isGranted: false })}
+                                            style={{ transition: 'all 0.2s' }}
+                                        >
+                                            <i className="bi bi-x-circle-fill me-2"></i> Not Grant
+                                        </div>
+                                    </div>
+                                    <Form.Text className="text-muted small mt-2 d-block">
+                                        {formData.isGranted ? 'User will be allowed to log in.' : 'User will be blocked from logging in.'}
+                                    </Form.Text>
                                 </Form.Group>
 
                                 <div className="d-flex justify-content-end gap-2 pt-2">

@@ -154,8 +154,8 @@ const CsvUploadPage = () => {
                                     onChange={(e) => setSelectedTemplateId(e.target.value)}
                                 >
                                     <option value="">Choose a template...</option>
-                                    {templates.map(t => (
-                                        <option key={t.id} value={t.id}>{t.name} {t.status === 'Draft' ? '(Draft)' : ''}</option>
+                                    {templates.filter(t => t.status === 'Published').map(t => (
+                                        <option key={t.id} value={t.id}>{t.name}</option>
                                     ))}
                                 </Form.Select>
                             </Form.Group>

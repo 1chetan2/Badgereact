@@ -12,6 +12,7 @@ const TemplateEditorPage = () => {
     const isEditMode = !!id;
 
     const [templateName, setTemplateName] = useState('New Badge Template');
+    const [templateStatus, setTemplateStatus] = useState('Draft');
     const [fields, setFields] = useState([]);
     const [selectedFieldId, setSelectedFieldId] = useState(null);
     const [backgroundImage, setBackgroundImage] = useState(null);
@@ -21,6 +22,7 @@ const TemplateEditorPage = () => {
     // Mapper: Backend DTO -> Frontend State
     const mapBackendToFrontend = (data) => {
         setTemplateName(data.name || 'Untitled Template');
+        setTemplateStatus(data.status || 'Draft');
         setBackgroundImage(data.background || null);
 
         const mappedFields = (data.fields || []).map(f => {
@@ -49,7 +51,7 @@ const TemplateEditorPage = () => {
     const mapFrontendToBackend = () => {
         return {
             name: templateName,
-            status: 'Published',
+            status: templateStatus,
             pageSize: 'A4',
             badgesPerPage: 1,
             badgeWidth: 86,
@@ -160,7 +162,28 @@ const TemplateEditorPage = () => {
                     placeholder="Enter template name..."
                 />
 
-                <Nav className="ms-auto d-flex gap-2">
+                <Nav className="ms-auto d-flex align-items-center gap-3">
+                    <div className="btn-group bg-light p-1 rounded-pill" style={{ border: '1px solid #dee2e6' }}>
+                        <Button
+                            variant={templateStatus === 'Published' ? 'success' : 'light'}
+                            className={`rounded-pill px-3 py-1 fw-bold border-0 ${templateStatus === 'Published' ? 'shadow-sm' : 'text-secondary'}`}
+                            onClick={() => setTemplateStatus('Published')}
+                            size="sm"
+                        >
+                             Published
+                        </Button>
+                        <Button
+                            variant={templateStatus === 'Draft' ? 'warning' : 'light'}
+                            className={`rounded-pill px-3 py-1 fw-bold border-0 ${templateStatus === 'Draft' ? 'shadow-sm' : 'text-secondary'}`}
+                            onClick={() => setTemplateStatus('Draft')}
+                            size="sm"
+                        >
+                             Draft
+                        </Button>
+                    </div>
+
+                    <div className="vr mx-2 text-muted opacity-25" style={{ height: '30px' }}></div>
+
                     <Button
                         variant="primary"
                         className="rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center"
