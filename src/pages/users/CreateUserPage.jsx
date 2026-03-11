@@ -66,7 +66,7 @@ const CreateUserPage = () => {
                                         <Form.Control
                                             name="name"
                                             type="text"
-                                            placeholder="Enter full name"
+                                        
                                             className="bg-light border-start-0 ps-0"
                                             value={formData.name}
                                             onChange={handleChange}
@@ -84,7 +84,7 @@ const CreateUserPage = () => {
                                         <Form.Control
                                             name="email"
                                             type="email"
-                                            placeholder="xyz@example.com"
+                                           
                                             className="bg-light border-start-0 ps-0"
                                             value={formData.email}
                                             onChange={handleChange}
@@ -102,7 +102,7 @@ const CreateUserPage = () => {
                                         <Form.Control
                                             name="password"
                                             type="password"
-                                            placeholder="Enter a secure password"
+                                           
                                             className="bg-light border-start-0 ps-0"
                                             value={formData.password}
                                             onChange={handleChange}
@@ -120,32 +120,30 @@ const CreateUserPage = () => {
                                         value={formData.role}
                                         onChange={handleChange}
                                     >
-                                        <option value="OrgUser">Organization Member</option>
+                                        <option value="OrgUser">Organization User</option>
                                         <option value="OrgAdmin">Organization Admin</option>
                                     </Form.Select>
                                 </Form.Group>
 
                                 <Form.Group className="mb-4">
-                                    <Form.Label className="small fw-semibold text-secondary d-block">Account Access</Form.Label>
+                                    <Form.Label className="small fw-semibold text-secondary d-block">User Status</Form.Label>
                                     <div className="d-flex gap-3 mt-2">
                                         <div
                                             className={`flex-fill p-3 rounded-4 border-2 cursor-pointer text-center transition-all ${formData.isGranted ? 'border-primary bg-primary bg-opacity-10 text-primary fw-bold' : 'border-light bg-light text-secondary'}`}
                                             onClick={() => setFormData({ ...formData, isGranted: true })}
                                             style={{ transition: 'all 0.2s' }}
                                         >
-                                            <i className="bi bi-check-circle-fill me-2"></i> Grant
+                                             Active
                                         </div>
                                         <div
                                             className={`flex-fill p-3 rounded-4 border-2 cursor-pointer text-center transition-all ${!formData.isGranted ? 'border-danger bg-danger bg-opacity-10 text-danger fw-bold' : 'border-light bg-light text-secondary'}`}
                                             onClick={() => setFormData({ ...formData, isGranted: false })}
                                             style={{ transition: 'all 0.2s' }}
                                         >
-                                            <i className="bi bi-x-circle-fill me-2"></i> Not Grant
+                                            Inactive
                                         </div>
                                     </div>
-                                    <Form.Text className="text-muted small mt-2 d-block">
-                                        {formData.isGranted ? 'User will be allowed to log in.' : 'User will be blocked from logging in.'}
-                                    </Form.Text>
+                                    
                                 </Form.Group>
 
                                 <div className="d-flex justify-content-end gap-2 pt-2">

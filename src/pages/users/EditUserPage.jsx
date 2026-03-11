@@ -72,7 +72,7 @@ const EditUserPage = () => {
                 </Button>
                 <div>
                     <h2 className="fw-bold text-dark mb-0">Edit User</h2>
-                    <p className="text-secondary mb-0">Modify organization member details and roles.</p>
+           
                 </div>
             </div>
 
@@ -92,7 +92,7 @@ const EditUserPage = () => {
                                         <Form.Control
                                             name="name"
                                             type="text"
-                                            placeholder="Enter full name"
+                                      
                                             className="bg-light border-start-0 ps-0"
                                             value={formData.name}
                                             onChange={handleChange}
@@ -115,7 +115,7 @@ const EditUserPage = () => {
                                             disabled // Email usually can't be changed
                                         />
                                     </div>
-                                    <Form.Text className="text-muted small">Email cannot be changed after creation.</Form.Text>
+                                   
                                 </Form.Group>
 
                                 <Form.Group className="mb-4">
@@ -126,32 +126,30 @@ const EditUserPage = () => {
                                         value={formData.role}
                                         onChange={handleChange}
                                     >
-                                        <option value="OrgUser">Organization Member</option>
+                                        <option value="OrgUser">Organization User</option>
                                         <option value="OrgAdmin">Organization Admin</option>
                                     </Form.Select>
                                 </Form.Group>
 
                                 <Form.Group className="mb-4">
-                                    <Form.Label className="small fw-semibold text-secondary d-block">Account Access</Form.Label>
+                                    <Form.Label className="small fw-semibold text-secondary d-block">User Status</Form.Label>
                                     <div className="d-flex gap-3 mt-2">
                                         <div
                                             className={`flex-fill p-3 rounded-4 border-2 cursor-pointer text-center transition-all ${formData.isGranted ? 'border-primary bg-primary bg-opacity-10 text-primary fw-bold' : 'border-light bg-light text-secondary'}`}
                                             onClick={() => setFormData({ ...formData, isGranted: true })}
                                             style={{ transition: 'all 0.2s' }}
                                         >
-                                            <i className="bi bi-check-circle-fill me-2"></i> Grant
+                                             Active
                                         </div>
                                         <div
                                             className={`flex-fill p-3 rounded-4 border-2 cursor-pointer text-center transition-all ${!formData.isGranted ? 'border-danger bg-danger bg-opacity-10 text-danger fw-bold' : 'border-light bg-light text-secondary'}`}
                                             onClick={() => setFormData({ ...formData, isGranted: false })}
                                             style={{ transition: 'all 0.2s' }}
                                         >
-                                            <i className="bi bi-x-circle-fill me-2"></i> Not Grant
+                                            Inactive
                                         </div>
                                     </div>
-                                    <Form.Text className="text-muted small mt-2 d-block">
-                                        {formData.isGranted ? 'User is allowed to log in.' : 'User is currently blocked from logging in.'}
-                                    </Form.Text>
+                                    
                                 </Form.Group>
 
                                 <div className="d-flex justify-content-end gap-2 pt-2">

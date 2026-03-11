@@ -11,8 +11,7 @@ const PropertiesPanel = ({ selectedField, onUpdateField }) => {
                 </Card.Header>
                 <Card.Body className="d-flex align-items-center justify-content-center text-center p-4">
                     <div className="text-secondary opacity-75">
-                        <i className="bi bi-cursor-fill display-6 mb-3 d-block"></i>
-                        <p className="small mb-0">Select an element on the canvas to edit its properties.</p>
+                        
                     </div>
                 </Card.Body>
             </Card>

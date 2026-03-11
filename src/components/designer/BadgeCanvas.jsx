@@ -1,8 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 
-// Default standard ID card ratio: ~3.375 x 2.125 inches (CR80)
-// Landscape orientation standard for event badges
 const BADGE_WIDTH_MM = 86;
 const BADGE_HEIGHT_MM = 54;
 const MM_TO_PX_RATIO = 4; // Scale factor for canvas view
@@ -19,9 +17,7 @@ const BadgeCanvas = ({
 }) => {
     const canvasRef = useRef(null);
 
-    // Coordinate conversion utilities
-    // The canvas operates in pixels for React-RND, but we save data in relative 
-    // percentages (0-100) or mm so it renders perfectly on the backend PDF generator regardless of monitor dpi
+   
 
     const pxToPercentX = (px) => (px / CANVAS_WIDTH) * 100;
     const pxToPercentY = (px) => (px / CANVAS_HEIGHT) * 100;
@@ -116,7 +112,7 @@ const BadgeCanvas = ({
                             onSelectField(field.id);
                         }}
                     >
-                        {/* Display sample text if available, otherwise just the field name so the user knows what it maps to */}
+                       
                         {field.sampleText || `[${field.name}]`}
                     </Rnd>
                 ))}

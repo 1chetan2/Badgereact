@@ -36,7 +36,7 @@ const LoginPage = () => {
             }
         } catch (error) {
             console.error('Login error:', error);
-            setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+            setError(error.response?.data?.message || 'Login failed');
         } finally {
             setLoading(false);
         }
@@ -49,7 +49,7 @@ const LoginPage = () => {
                     <Col xs={12} sm={10} md={8} lg={5} xl={4}>
                         <div className="text-center mb-4">
                             <h1 className="fw-bold text-primary display-5 mb-1">BadgeCraft</h1>
-                            <p className="text-secondary">Sign in to your account</p>
+                            
                         </div>
 
                         <Card className="shadow border-0 rounded-4 overflow-hidden">
@@ -65,7 +65,7 @@ const LoginPage = () => {
                                             </span>
                                             <Form.Control
                                                 type="email"
-                                                placeholder="name@company.com"
+                                        
                                                 className="bg-light border-start-0 ps-0"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +82,7 @@ const LoginPage = () => {
                                             </span>
                                             <Form.Control
                                                 type="password"
-                                                placeholder="••••••••"
+                                                
                                                 className="bg-light border-start-0 ps-0"
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
@@ -113,9 +113,7 @@ const LoginPage = () => {
                                 </Form>
                             </Card.Body>
                         </Card>
-                        <p className="text-center text-muted mt-4 small">
-                            &copy; {new Date().getFullYear()} BadgeCraft. All rights reserved.
-                        </p>
+                       
                     </Col>
                 </Row>
             </Container>

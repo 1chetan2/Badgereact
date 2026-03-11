@@ -136,7 +136,7 @@ const CsvUploadPage = () => {
         <div>
             <div className="mb-4">
                 <h2 className="fw-bold text-dark">Upload Attendees</h2>
-                <p className="text-secondary">Select a template and securely upload your CSV attendee list.</p>
+              
             </div>
 
             <Row className="justify-content-center">
@@ -179,8 +179,7 @@ const CsvUploadPage = () => {
                                         <div className="fw-bold text-primary">{file.name}</div>
                                     ) : (
                                         <>
-                                            <p className="mb-1 fw-medium text-dark">Click to browse or drag and drop</p>
-                                            <p className="text-muted small mb-0">Only CSV files supported (Max 5MB)</p>
+                                           
                                         </>
                                     )}
                                 </div>
